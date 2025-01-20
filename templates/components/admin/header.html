@@ -1,0 +1,23 @@
+<header class="fixed top-0 left-0 z-30 w-full bg-white border-b border-gray-200 px-6 py-2 shadow-sm">
+    <div class="flex items-center justify-between">
+        <!-- ส่วนของโลโก้ -->
+        <div class="flex items-center">
+            <a href="{% url 'dashboard' %}" class="flex items-center group">
+                {% load static %}
+                <img src="{% static 'images/logo/X_Black_Logo.svg' %}" alt="CNStyleShop Logo" class="h-12 w-auto">
+            </a>
+        </div>
+
+        <!-- ส่วนข้อมูลของแอดมิน -->
+        <div class="mr-6 flex items-center gap-6">
+            <div class="flex items-center space-x-4">
+                <img src="{{ user.profile_picture.url }}" alt="Profile picture of {{ user.username }}" 
+                     class="w-10 h-10 object-cover rounded-full border-2 border-gray-400 hover:scale-105 transition-transform duration-300">
+                <div class="flex flex-col items-start">
+                    <span class="text-gray-800 font-semibold text-md">{{ user.username }}</span>
+                    <span class="text-gray-500 text-xs">{{ user.email }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

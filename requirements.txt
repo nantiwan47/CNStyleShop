@@ -1,0 +1,4 @@
+Django~=5.1.5
+pillow
+django-tailwind
+django-browser-reload

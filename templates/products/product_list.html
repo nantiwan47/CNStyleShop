@@ -1,0 +1,141 @@
+{% extends 'base_admin.html' %}
+{% load static %}
+
+{% block content %}
+<div class="px-8 min-h-screen pb-6">
+    <div class="flex flex-col sm:flex-row sm:justify-between items-center gap-4 mb-6">
+        <!-- ช่องค้นหาสินค้า -->
+        <form method="GET" action="{% url 'product_list' %}" class="flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-xl">
+             <!-- Dropdown ประเภทสินค้า -->
+            <div class="flex-shrink-0">
+                <label for="category" class="sr-only">ประเภทสินค้า</label>
+                <select id="category" name="category" class=" border border-gray-300 bg-white px-4 py-2 pr-10 rounded-md text-gray-700 w-full">
+                    <option value="">-- ทุกประเภท --</option>
+                    {% for key, value in category_choices %}
+                        <option value="{{ key }}" {% if key == selected_category %}selected{% endif %}>
+                            {{ key }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <!-- ช่องค้นหา -->
+            <div class="flex-grow">
+                <label for="search" class="sr-only">ค้นหา</label>
+                <input type="search" 
+                       name="search" 
+                       id="search"
+                       placeholder="ค้นหาชื่อสินค้า" 
+                       value="{{ query }}" 
+                       class="px-4 py-2 border border-gray-300 rounded-md w-full"/>
+            </div>
+        
+            <!-- ปุ่มค้นหา -->
+            <button type="submit" 
+                    class="bg-blue-500 text-white px-4 py-2 rounded-md shadow flex-shrink-0 hover:bg-blue-600 transition">
+                ค้นหา
+            </button>
+        </form>
+        
+        <!-- ปุ่มเพิ่มสินค้า -->
+        <a href="{% url 'product_create' %}" 
+           class="flex items-center gap-2 bg-green-500 text-white py-2 px-4 rounded-md shadow hover:bg-green-600 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            เพิ่มสินค้า
+        </a>
+    </div>
+    
+    <!-- ตารางแสดงสินค้า -->
+    <div class="overflow-x-auto rounded-lg shadow-lg">
+        <table class="min-w-full bg-white text-left">
+            <thead>
+                <tr class="bg-gray-300 text-gray-700">
+                    <th class="px-6 py-3">รหัสสินค้า</th> 
+                    <th class="px-6 py-3">ชื่อสินค้า</th>
+                    <th class="px-6 py-3">ประเภทสินค้า</th>
+                    <th class="px-6 py-3">ราคา (ต่ำ - สูง)</th>
+                    <th class="px-6 py-3 text-center">จัดการ</th>
+                </tr>
+            </thead>
+        
+            <tbody id="product-list" class="divide-y divide-gray-200">
+                {% for product in page_obj %}
+                    <tr class="hover:bg-gray-100 transition">
+                        <td class="px-6 py-3">{{ product.id }}</td>
+                        <td class="px-6 py-3">{{ product.name }}</td>
+                        <td class="px-6 py-3">{{ product.category }}</td>
+                        
+                        <!-- ตรวจสอบราคาของสินค้า -->
+                        {% if product.min_price == product.max_price %}
+                            <td class="px-6 py-3">{{ product.min_price }}</td>
+                        {% else %}
+                            <td class="px-6 py-3">{{ product.min_price }} - {{ product.max_price }}</td>
+                        {% endif %}
+                    
+                        <td class="px-8 py-3 text-center flex justify-between">
+                            <a href="{% url 'product_edit' product.id %}" 
+                               class="bg-gray-100 text-blue-500 py-1 px-3 rounded-md shadow hover:bg-gray-200 transition">
+                               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                  <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+                                  <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
+                                </svg>
+                            </a>
+                            <button class="delete-btn bg-red-500 text-white py-1 px-3 rounded-md shadow hover:bg-red-600 transition" 
+                                    data-id="{{ product.id }}">
+                                    ลบ
+                            </button>
+                        </td>
+                    </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-6 py-3 text-center text-gray-500">
+                        ไม่พบผลลัพธ์ที่ตรงกับคำค้นหาของคุณ
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% include "components/admin/pagination.html" with page_obj=page_obj query=query selected_category=selected_category %}
+
+</div>
+
+<script>
+    // จัดการเหตุการณ์การลบ ใช้ event delegation กับองค์ประกอบพ่อแม่ (#product-list)
+    document.getElementById('product-list').addEventListener('click', function(event) {
+        // ตรวจสอบว่า element ที่คลิกเป็นปุ่มลบหรือไม่
+        if (event.target.matches('.delete-btn')) {
+            const productID = event.target.getAttribute('data-id');
+    
+            Swal.fire({
+                title: 'ยืนยันการลบข้อมูล',
+                text: 'คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?',
+                showCancelButton: true,
+                cancelButtonColor: '#B0BEC5',
+                confirmButtonColor: '#f44336',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: 'ยืนยันการลบ',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/product/delete/${productID}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            window.location.reload(); // รีเฟรชหน้าเพื่อดูการเปลี่ยนแปลง;
+                        } else {
+                            Swal.fire('เกิดข้อผิดพลาด!', '', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
