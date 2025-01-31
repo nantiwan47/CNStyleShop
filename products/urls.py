@@ -1,12 +1,11 @@
 from django.urls import path
-from .views import  *
+from .views import ProductListView,ProductCreateView, ProductEditView, ProductDeleteView, DeleteImageView
 
 urlpatterns = [
- path('dashboard/', dashboard, name='dashboard'),
- path('product/list', product_list, name="product_list"),
- path('product/create/', product_create, name="product_create"),
- path('product/edit/<int:product_id>/', product_edit, name='product_edit'),
- path('product/delete_image/<int:image_id>/', delete_image, name='delete_image'),
- path('product/delete/<int:product_id>/', product_delete, name='product_delete'),
+ path('product/list', ProductListView.as_view(), name="product_list"),
+ path('product/create/', ProductCreateView.as_view(), name="product_create"),
+ path('product/edit/<int:pk>/', ProductEditView.as_view(), name='product_edit'),
+ path('product/delete-image/<int:image_id>/', DeleteImageView.as_view(),  name='delete_image'),
+ path('product/delete/<int:pk>/', ProductDeleteView.as_view(), name='product_delete'),
 
 ]

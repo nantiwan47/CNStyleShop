@@ -1,0 +1,28 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+<h1>รายละเอียดคำสั่งซื้อ #{{ order.order_code }}</h1>
+<p>ชื่อ: {{ order.full_name }}</p>
+<p>เบอร์โทร: {{ order.phone }}</p>
+<p>ที่อยู่: {{ order.address }}</p>
+<p>ราคารวม: {{ order.total_price }} บาท</p>
+<p>วิธีการจัดส่ง: {{ order.shipping_method.get_method_name_display }} - ราคา: {{ order.shipping_method.cost }} บาท</p>
+<p>วิธีการชำระเงิน: {{ order.get_payment_method_display }}</p>
+    {% if order.payment_image %}
+    <h2>สลิปโอนเงิน</h2>
+    <img src="{{ order.payment_image.url }}" alt="สลิปโอนเงิน" style="max-width: 500px; height: auto;">
+{% else %}
+    <p>ไม่มีสลิปโอนเงิน</p>
+{% endif %}
+<p>สถานะ: {{ order.get_status_display }}</p>
+<p>วันที่สั่งซื้อ: {{ order.order_date }}</p>
+
+<h2>สินค้าในคำสั่งซื้อ</h2>
+<ul>
+    {% for item in order.items.all %}
+    <li>
+        สินค้า: {{ item.product.name }} - จำนวน: {{ item.quantity }} - สี: {{ item.color }} - ขนาด: {{ item.size }} - ราคาต่อหน่วย: {{ item.unit_price }} บาท - ราคารวม: {{ item.total_price }} บาท
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

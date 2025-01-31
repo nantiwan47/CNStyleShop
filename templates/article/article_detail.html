@@ -1,0 +1,39 @@
+{% extends "base_admin.html" %}
+{% block extra_head %}
+<style>
+        .article-defaults ul {
+            list-style-type: disc; /* ใช้จุดใน unordered list */
+            margin: revert;
+            padding: revert;
+        }
+
+        .article-defaults ol {
+            list-style-type: decimal; /* ใช้เลขใน ordered list */
+            margin: revert;
+            padding: revert;
+        }
+
+        .article-defaults menu {
+            list-style: initial; /* ใช้สไตล์เริ่มต้นสำหรับ menu */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+   <h1>{{ article.title }}</h1>
+    <h1>{{ article.views }}</h1>
+    <p><strong>หมวดหมู่:</strong> {{ article.category }}</p>
+    <p><strong>ผู้เขียน:</strong> {{ article.user.username }}</p>
+    <p><strong>วันที่สร้าง:</strong> {{ article.created_at }}</p>
+    <p><strong>เนื้อหาบทความ:</strong></p>
+
+
+<div class="article-defaults">
+  {{ article.content|safe }}
+</div>
+    <br>
+    <a href="{% url 'article_list' %}">กลับไปยังหน้ารายการบทความ</a>
+
+
+{% endblock %}

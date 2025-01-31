@@ -1,0 +1,12 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+<h1>รายการคำสั่งซื้อทั้งหมด</h1>
+<ul>
+    {% for order in orders %}
+    <li>
+        <a href="{% url 'order_detail' order.id %}">คำสั่งซื้อ #{{ order.order_code }}</a> - {{ order.full_name }} - สถานะ: {{ order.get_status_display }}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

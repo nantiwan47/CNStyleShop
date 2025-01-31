@@ -1,0 +1,16 @@
+{% extends "base_admin.html" %}
+
+{% block extra_head %}
+    <!-- สำหรับการโหลด TinyMCE -->
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+    <h1>Create Article</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p  }}
+        <button type="submit">Submit</button>
+    </form>
+
+{% endblock %}

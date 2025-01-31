@@ -49,13 +49,23 @@ class AdminLoginView(LoginView):
     template_name = 'accounts/admin_login.html'
 
     def get_success_url(self) -> str:
+        # ดึงค่า next จาก URL หากมี
+        next_url = self.request.GET.get('next')
+
         # บอก IDE ว่า self.request.user คือ UserProfile
         user = cast(UserProfile, self.request.user)
 
         # ตรวจสอบ role ของผู้ใช้
         if user.role == 'admin':
-            # return reverse_lazy('dashboard')
-            return reverse_lazy('product_list')
+            if next_url:
+                return next_url  # ไปที่หน้าที่ผู้ใช้พยายามเข้าถึง
+            else:
+                # return reverse_lazy('dashboard')
+                return reverse_lazy('product_list')
+
+        # เพิ่มข้อความแจ้งเตือน และกลับไปหน้า login ของแอดมิน
+        messages.error(self.request, "กรุณาล็อกอินด้วยบัญชีแอดมิน")
+        return reverse_lazy('admin_login')
 
 class AdminLogoutView(LogoutView):
     next_page = reverse_lazy('admin_login')

@@ -1,0 +1,42 @@
+{% extends "base_admin.html" %}
+
+{% block extra_head %}
+    <!-- สำหรับการโหลด TinyMCE -->
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+    <h1>แก้ไขบทความ: {{ article.title }}</h1>
+     <li>{{ article.user.username}}</li>
+
+     <form method="POST">
+        {% csrf_token %}
+
+        <!-- แสดงฟิลด์แต่ละอัน -->
+        <div>
+            <label for="{{ form.title.id_for_label }}">ชื่อบทความ</label>
+            {{ form.title }}  <!-- ฟิลด์ชื่อบทความ -->
+        </div>
+
+        <div>
+            <label for="{{ form.content.id_for_label }}">เนื้อหาบทความ</label>
+            {{ form.content }}  <!-- ฟิลด์เนื้อหาบทความ -->
+        </div>
+
+        <div>
+            <label for="{{ form.category.id_for_label }}">หมวดหมู่</label>
+            {{ form.category }}  <!-- ฟิลด์หมวดหมู่ -->
+        </div>
+
+        <div>
+            <label for="{{ form.image.id_for_label }}">รูปภาพ</label>
+            {{ form.image }}  <!-- ฟิลด์รูปภาพ -->
+        </div>
+
+        <button type="submit">บันทึกการแก้ไข</button>
+    </form>
+
+
+    <a href="{% url 'article_list' %}">กลับไปยังหน้ารายการบทความ</a>
+
+{% endblock %}

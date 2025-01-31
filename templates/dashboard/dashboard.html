@@ -1,0 +1,66 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+    <!-- ปุ่มวิเคราะห์รีวิว -->
+<form action="{% url 'analyze_reviews' %}" method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-primary">วิเคราะห์รีวิว</button>
+</form>
+
+    <!-- แสดงข้อความแจ้งเตือน (success/error) -->
+{% if messages %}
+    <div class="mt-3">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+
+    <!-- แสดงผลการวิเคราะห์ -->
+{% if analysis_results %}
+    <h2 class="mt-4">ผลการวิเคราะห์รีวิว</h2>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>รีวิว</th>
+                <th>คะแนน</th>
+                <th>Polarity</th>
+                <th>คำเชิงบวก</th>
+                <th>คำเชิงลบ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for analysis in analysis_results %}
+                <tr>
+                    <td>{{ analysis.review.comment }}</td>
+                    <td>{{ analysis.score }}</td>
+                    <td>{{ analysis.polarity }}</td>
+                    <td>
+                        {% for sentiment in analysis.reviewsentiment_set.all %}
+                            {% if sentiment.sentiment_type == 'positive' %}
+                                {{ sentiment.word }}{% if not forloop.last %}, {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for sentiment in analysis.reviewsentiment_set.all %}
+                            {% if sentiment.sentiment_type == 'negative' %}
+                                {{ sentiment.word }}{% if not forloop.last %}, {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p class="mt-4">ไม่มีข้อมูลการวิเคราะห์ในขณะนี้</p>
+{% endif %}
+
+
+{% endblock %}

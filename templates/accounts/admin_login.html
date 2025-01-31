@@ -16,26 +16,28 @@
 </head>
 <body>
     <div class="h-screen w-screen bg-cover bg-top" style="background-image: url('{% static "images/bg_Login2.jpg" %}')">
-        <!-- เลเยอร์สีดำ -->
-        <!--<div class="absolute inset-0 bg-black bg-opacity-60"></div>-->
-        
-        <div class="relative flex h-screen">
+
+        <div class="flex h-screen">
             <!-- ส่วนซ้าย: โลโก้ -->
-            <div class="w-1/2 flex items-center justify-center">
-                <img 
-                    src="{% static 'images/logo/White_Logo.svg' %}" 
-                    alt="CN Style Shop" 
-                    class="mx-auto h-3/4 shadow-xl"
-                >
+
+            <div class="w-1/2 hidden lg:flex items-center justify-center">
+                <a href="{% url 'dashboard' %}" >
+                    <img
+                        src="{% static 'images/logo/White_Logo.svg' %}"
+                        alt="CN Style Shop"
+                        class="mx-auto h-3/4 shadow-xl"
+                    >
+                </a>
             </div>
 
             <!-- ส่วนขวา: ฟอร์ม Login -->
-            <div class="w-1/2 flex items-center justify-center">
+            <div class="w-full lg:w-1/2 flex items-center justify-center">
                 <div class="p-8 rounded-2xl shadow-md w-[30rem] bg-white">
                     <h2 class="text-2xl font-bold mb-8 text-center">Login to Admin Account</h2>
         
                     <form method="POST" class="space-y-6 mb-8">
                         {% csrf_token %}
+
                          <!-- แสดง errors จาก form -->
                         {% include "components/alert/error_alert.html" with errors=form.non_field_errors %}
                         
@@ -88,11 +90,11 @@
                         </button>
                     </form>
                     
-                    <!-- ลิงก์สำหรับสมัครสมาชิก -->
-                    <p class="text-center text-sm text-gray-500">
-                        คุณยังไม่มีบัญชีใช่ไหม?
-                        <a href="{% url 'register' %}" class="text-blue-500 no-underline">สมัครสมาชิก</a>
-                    </p>
+{#                    <!-- ลิงก์สำหรับสมัครสมาชิก -->#}
+{#                    <p class="text-center text-sm text-gray-500">#}
+{#                        คุณยังไม่มีบัญชีใช่ไหม?#}
+{#                        <a href="{% url 'register' %}" class="text-blue-500 no-underline">สมัครสมาชิก</a>#}
+{#                    </p>#}
                 </div>
             </div>
         </div> 

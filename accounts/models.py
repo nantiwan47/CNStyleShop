@@ -8,7 +8,7 @@ class UserProfile(AbstractUser):
     last_name = None
 
     # เพิ่มฟิลด์ใหม่
-    gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other'),], blank=True)
+    gender = models.CharField(max_length=10, choices=[('male', 'ชาย'), ('female', 'หญิง'), ('other', 'อื่น ๆ'),], blank=True)
     date_of_birth = models.DateField(blank=True, null=True)
     phone_number = models.CharField(
         blank=True,

@@ -24,13 +24,21 @@ from django.views.generic import TemplateView
 urlpatterns = [
     path("__reload__/", include("django_browser_reload.urls")),
 
+    path('tinymce/', include('tinymce.urls')),
+
     path('', TemplateView.as_view(template_name='home.html'), name='home'),
 
-    path("dj-admin/", admin.site.urls),
+    path('dj-admin/', admin.site.urls),
 
     path('account/', include('accounts.urls')),
 
     path('admin/', include('products.urls')),
+
+    path('admin/', include('articles.urls')),
+
+    path('admin/', include('orders.urls')),
+
+    path('admin/', include('dashboard.urls')),
 ]
 
 # เสริมสำหรับเสิร์ฟ Media Files ในโหมด Development

@@ -39,10 +39,15 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "accounts",
     "products",
+    "articles",
+    "orders",
+    "dashboard",
 
     "tailwind",
     "theme",
     "django_browser_reload",
+
+    "tinymce"
 ]
 
 MIDDLEWARE = [
@@ -155,3 +160,13 @@ MEDIA_ROOT = BASE_DIR / 'media'  # โฟลเดอร์เก็บไฟล
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+TINYMCE_DEFAULT_CONFIG = {
+    'height': 300,  # ความสูงของ editor
+    'width': 'auto',  # ปรับให้เหมาะกับพื้นที่
+    'toolbar': 'undo redo |fontsize forecolor backcolor |bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist',  # เครื่องมือพื้นฐาน
+    'menubar': False,  # ปิดเมนูด้านบน
+    'plugins': 'lists',  # เพิ่มปลั๊กอิน lists
+    'branding': False,  # ซ่อนโลโก้ TinyMCE
+}
+

@@ -37,6 +37,7 @@
 
                     <form method="POST" class="space-y-6 mb-8">
                         {% csrf_token %}
+
                          <!-- แสดง errors จาก form -->
                         {% include "components/alert/error_alert.html" with errors=form.non_field_errors %}
 

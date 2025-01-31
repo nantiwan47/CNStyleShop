@@ -1,0 +1,90 @@
+{% extends "base_admin.html" %}
+
+{% block extra_head %}
+    <!-- สำหรับการโหลด TinyMCE -->
+    {{ form.media }}
+{% endblock %}
+
+{% block content %}
+     <h1>รายการบทความทั้งหมด</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ชื่อบทความ</th>
+                <th>หมวดหมู่</th>
+                <th>ผู้เขียน</th>
+                <th>เนื้อหาบทความ</th>
+                <th>วันที่สร้าง</th>
+                <th>การกระทำ</th>
+            </tr>
+        </thead>
+        <tbody id="article-list">
+            {% for article in articles %}
+            <tr>
+                <td>{{ article.title }}</td>
+                <td>{{ article.category }}</td>
+                <td>{{ article.user.username }}</td> <!-- แสดงชื่อผู้เขียน -->
+                <td>{{ article.content|safe  }}</td>  <!-- แสดงเนื้อหาบทความ (ตัดที่ 20 คำ) -->
+                <td>{{ article.created_at }}</td>
+                <td>                    <a href="{% url 'article_detail' article.id %}">ดูรายละเอียด</a> |
+
+                    <a href="{% url 'article_edit' article.id %}">แก้ไข</a> |
+                    <button class="delete-btn bg-red-500 text-white py-1 px-3 rounded-md shadow hover:bg-red-600 transition"
+                                    data-id="{{ article.id }}">
+                                    ลบ
+                            </button>
+                </td>
+
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6">ยังไม่มีบทความ</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+  <a href="{% url 'article_create' %}">Create New Article</a>
+
+
+<script>
+    // จัดการเหตุการณ์การลบ ใช้ event delegation กับองค์ประกอบพ่อแม่ (#product-list)
+    document.getElementById('article-list').addEventListener('click', function(event) {
+        // ตรวจสอบว่า element ที่คลิกเป็นปุ่มลบหรือไม่
+        if (event.target.matches('.delete-btn')) {
+            const articleID = event.target.getAttribute('data-id');
+
+            Swal.fire({
+                title: 'ยืนยันการลบข้อมูล',
+                text: 'คุณแน่ใจหรือไม่ว่าต้องการลบข้อมูลนี้?',
+                customClass: {
+                    popup: 'rounded-2xl shadow-2xl bg-white p-8', // กรอบป๊อปอัป
+                    title: 'text-lg font-bold text-gray-800', // สไตล์หัวข้อ
+                  },
+                showCancelButton: true,
+                cancelButtonColor: '#B0BEC5',
+                confirmButtonColor: '#f44336',
+                cancelButtonText: 'ยกเลิก',
+                confirmButtonText: 'ยืนยันการลบ',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/article/delete/${articleID}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        }
+                    }).then(response => {
+                        if (response.ok) {
+                            window.location.reload(); // รีเฟรชหน้าเพื่อดูการเปลี่ยนแปลง;
+                        } else {
+                            Swal.fire('เกิดข้อผิดพลาด!', '', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    });
+
+
+</script>
+{% endblock %}

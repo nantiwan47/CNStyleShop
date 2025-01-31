@@ -59,18 +59,18 @@
                     <tbody id="options-container" class="divide-y divide-gray-200">
                         <tr>
                             <td class="px-6 py-3">
-                                <label for="color-input" class="sr-only">Color</label>
-                                <input type="text" id="color-input" name="color[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
+                                <label for="color-input-1"  class="sr-only">Color</label>
+                                <input type="text" id="color-input-1" name="color[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
                             </td>
                             
                             <td class="px-6 py-3">
-                                <label for="size-input" class="sr-only">Size</label>
-                                <input type="text" id="size-input" name="size[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
+                                <label for="size-input-1" class="sr-only">Size</label>
+                                <input type="text" id="size-input-1" name="size[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
                             </td>
                             
                             <td class="px-6 py-3">
-                                <label for="price-input" class="sr-only">Size</label>
-                                <input type="number" id="price-input" name="price[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
+                                <label for="price-input-1" class="sr-only">Size</label>
+                                <input type="number" id="price-input-1" name="price[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
                             </td>
                             
                             <td class="px-6 py-3 text-center">
@@ -179,20 +179,25 @@
         }
 
         // ฟังก์ชันเพิ่มตัวเลือกสินค้าใหม่
+        let rowCount = 1;
         function addOption() {
+            rowCount++;
             const optionsContainer = document.getElementById("options-container");
             const newRow = document.createElement("tr");
             newRow.innerHTML = `
                 <td class="px-6 py-3" >
-                   <input type="text" name="color[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
+                    <label for="color-input-${rowCount}" class="sr-only">Color</label>
+                    <input type="text"  id="color-input-${rowCount}" name="color[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
                 </td>
                             
                 <td class="px-6 py-3" >
-                   <input type="text" name="size[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
+                    <label for="size-input-${rowCount}" class="sr-only">Size</label>
+                    <input type="text" id="size-input-${rowCount}" name="size[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
                 </td>
                             
                 <td class="px-6 py-3" >
-                   <input type="number" name="price[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
+                    <label for="price-input-${rowCount}" class="sr-only">Size</label>
+                    <input type="number" id="price-input-${rowCount}" name="price[]" class="w-full p-2 border border-gray-400 rounded-lg" required>
                 </td>
 
                 <td class="px-6 py-3 text-center">
