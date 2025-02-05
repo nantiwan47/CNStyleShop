@@ -1,43 +1,16 @@
-from django.contrib.auth.decorators import login_required
-from .forms import ArticleForm
-from .models import Article
-from django.shortcuts import render, get_object_or_404, redirect
 import os
+
+from django.db import transaction
 from django.http import JsonResponse
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
 
-@login_required(login_url='/account/admin-login')
-def article_list(request):
-    articles = Article.objects.all().order_by('-created_at')  # จัดเรียงจากใหม่ไปเก่า
-    return render(request, 'article/article_list.html', {'articles': articles})
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
-@login_required(login_url='/account/admin-login')
-def article_create(request):
-    if request.method == 'POST':
-        form = ArticleForm(request.POST, request.FILES)
-        if form.is_valid():
-            article = form.save(commit=False)
-            article.user = request.user  # กำหนด user จากที่ล็อกอินอยู่
-            article.save()
-            return redirect('article_list')
-    else:
-        form = ArticleForm()
+from .models import Article
+from .forms import ArticleForm
 
-    return render(request, 'article/article_create.html', {'form': form})
-
-@login_required(login_url='/account/admin-login')
-def article_edit(request, article_id):
-    # ดึงบทความที่ต้องการแก้ไขโดยใช้ article_id
-    article = get_object_or_404(Article, id=article_id)
-
-    if request.method == 'POST':
-        form = ArticleForm(request.POST, instance=article)  # ส่งข้อมูลเก่ามาด้วยเพื่ออัปเดต
-        if form.is_valid():
-            form.save()  # บันทึกข้อมูลที่แก้ไขลงในฐานข้อมูล
-            return redirect('article_list')
-    else:
-        form = ArticleForm(instance=article)  # โหลดฟอร์มพร้อมข้อมูลเดิม
-
-    return render(request, 'article/article_edit.html', {'form': form, 'article': article})
 
 def delete_file(file_path):
     # ตรวจสอบว่าไฟล์ที่ต้องการลบมีอยู่จริงในระบบไฟล์หรือไม่
@@ -47,27 +20,80 @@ def delete_file(file_path):
         except Exception as e:
             print(f"Error while deleting file: {e}")
 
-@login_required(login_url='/account/admin-login')
-def article_delete(request, article_id):
-    # ดึงบทความตาม ID
-    article = get_object_or_404(Article, id=article_id)
-    if request.method == 'POST':
-        article.delete()
+class ArticleListView(LoginRequiredMixin, ListView):
+    login_url = 'admin_login'
+    model = Article
+    template_name = 'article/article_list.html'
+    paginate_by = 2 # แบ่งหน้า 10 รายการ
+
+    def get_queryset(self):
+        # รับค่าค้นหาจาก URL
+        query = self.request.GET.get('search', '').strip()  # กรณีที่ไม่มีคำค้นหาจะเป็นค่าว่าง และตัดช่องว่างหัวท้ายออก
+        category = self.request.GET.get('category', '')
+
+        articles = Article.objects.all().order_by('-id')  # จัดเรียงจากใหม่ไปเก่า
+
+        # กรองข้อมูลตามคำค้นหาและหมวดหมู่
+        if query:
+            articles = articles.filter(title__icontains=query)
+        if category and category in dict(Article.CATEGORY_CHOICES):
+            articles = articles.filter(category=category)
+
+        return articles
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        query_params = self.request.GET.copy()  # คัดลอก query parameters
+        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page' ถ้ามีอยู่ เพื่อป้องกันค่าหน้าเก่าถูกส่งไป
+
+        context['selected_category'] = self.request.GET.get('category', '')
+        context['category_choices'] = Article.CATEGORY_CHOICES  # ส่ง Choices ไปที่ Template
+        context['query_params'] = query_params.urlencode()  # แปลงเป็น query string ที่ใช้ใน URL
+
+        return context
+
+class ArticleCreateView(LoginRequiredMixin, CreateView):
+    login_url = 'admin_login'
+    model = Article
+    form_class = ArticleForm
+    template_name = 'article/article_create.html'
+    success_url = reverse_lazy('article_list')
+
+    @transaction.atomic
+    def form_valid(self, form):
+        form.instance.user = self.request.user  # กำหนด user จากที่ล็อกอินอยู่
+
+        messages.success(self.request, f'เพิ่มบทความ "{form.instance.title}" สำเร็จ!')
+        return super().form_valid(form) # บันทึกข้อมูลและ redirect ไปยัง success_url
+
+class ArticleUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = 'admin_login'
+    model = Article
+    form_class = ArticleForm
+    template_name = 'article/article_edit.html'
+    success_url = reverse_lazy('article_list')
+
+    def form_valid(self, form):
+        article = form.save()  # บันทึกข้อมูลบทความ
+        messages.success(self.request, f"แก้ไขบทความ '{article.title}' สำเร็จ!")
+        return super().form_valid(form)
+
+class ArticleDeleteView(LoginRequiredMixin, DeleteView):
+    login_url = 'admin_login'
+    model = Article
+
+    def post(self, request, *args, **kwargs):
+        # ดึงข้อมูลบทความที่ต้องการลบ
+        article = self.get_object()
+
+        # ลบรูปภาพปกของบทความ (image) ออกจากระบบไฟล์ (filesystem) ของเซิร์ฟเวอร์
+        # เรียกฟังก์ชัน delete_file เพื่อลบไฟล์รูปภาพบทความ
         delete_file(article.image.path)
+
+        # ลบบทความออกจากฐานข้อมูล
+        article.delete()
+
+        messages.success(self.request, 'ลบข้อมูลบทความสำเร็จ!')
         return JsonResponse({'status': 'success'}, status=200)
 
-    return JsonResponse({'status': 'fail'}, status=400)
-
-@login_required(login_url='/account/admin-login')
-def article_detail(request, article_id):
-    # ดึงบทความตาม ID
-    article = get_object_or_404(Article, id=article_id)
-    session_key = f'viewed_post_{article_id}'  # กำหนด session_key เพื่อเก็บข้อมูลการดูบทความ
-
-    # ตรวจสอบว่าผู้ใช้เคยดูบทความนี้แล้วหรือไม่ ถ้ายังไม่เคยดูให้เพิ่มจำนวนการดู
-    if not request.session.get(session_key, False):
-        request.session[session_key] = True
-        article.views += 1
-        article.save()
-
-    return render(request, 'article/article_detail.html', {'article': article})

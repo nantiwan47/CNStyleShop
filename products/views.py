@@ -14,16 +14,37 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Product, ProductOption, ProductImage
 from .forms import ProductForm
 
+
+def save_product_options(product, colors, sizes, prices):
+    """
+    บันทึกตัวเลือกสินค้า (ProductOption) ลงในฐานข้อมูล
+    """
+    for color, size, price in zip(colors, sizes, prices):
+        ProductOption.objects.create(
+            product=product,
+            color=color,
+            size=size,
+            price=price
+        )
+
+def delete_file(file_path):
+    # ตรวจสอบว่าไฟล์ที่ต้องการลบมีอยู่จริงในระบบไฟล์หรือไม่
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+        except Exception as e:
+            print(f"Error while deleting file: {e}")
+
 class ProductListView(LoginRequiredMixin, ListView):
     login_url = 'admin_login'
     model = Product
     template_name = "products/product_list.html"
-    paginate_by = 2  # แบ่งหน้า 10 รายการ
+    paginate_by = 1  # แบ่งหน้า 10 รายการ
 
     def get_queryset(self):
         # รับค่าค้นหาจาก URL
         query = self.request.GET.get('search', '').strip() # กรณีที่ไม่มีคำค้นหาจะเป็นค่าว่าง และตัดช่องว่างหัวท้ายออก
-        category = self.request.GET.get('category') or None
+        category = self.request.GET.get('category', '')
 
         # ดึงข้อมูลสินค้าพร้อมราคาต่ำสุดและสูงสุด
         products = Product.objects.annotate(
@@ -42,22 +63,15 @@ class ProductListView(LoginRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['query'] = self.request.GET.get('search', '')
+
+        query_params = self.request.GET.copy() # คัดลอก query parameters
+        query_params.pop('page', None) # ลบพารามิเตอร์ 'page' ถ้ามีอยู่ เพื่อป้องกันค่าหน้าเก่าถูกส่งไป
+
         context['selected_category'] = self.request.GET.get('category', '')
         context['category_choices'] = Product.CATEGORY_CHOICES  # ส่ง Choices ไปที่ Template
-        return context
+        context['query_params'] = query_params.urlencode()  # แปลงเป็น query string ที่ใช้ใน URL
 
-def save_product_options(product, colors, sizes, prices):
-    """
-    บันทึกตัวเลือกสินค้า (ProductOption) ลงในฐานข้อมูล
-    """
-    for color, size, price in zip(colors, sizes, prices):
-        ProductOption.objects.create(
-            product=product,
-            color=color,
-            size=size,
-            price=price
-        )
+        return context
 
 class ProductCreateView(LoginRequiredMixin, CreateView):
     login_url = 'admin_login'
@@ -145,18 +159,9 @@ class ProductEditView(LoginRequiredMixin, UpdateView):
         messages.success(self.request, f'แก้ไขข้อมูลสินค้า "{product.name}" สำเร็จ!')
         return super().form_valid(form)
 
-def delete_file(file_path):
-    # ตรวจสอบว่าไฟล์ที่ต้องการลบมีอยู่จริงในระบบไฟล์หรือไม่
-    if os.path.exists(file_path):
-        try:
-            os.remove(file_path)
-        except Exception as e:
-            print(f"Error while deleting file: {e}")
-
 class DeleteImageView(View):
 
-    @staticmethod
-    def delete(request, image_id):
+    def delete(self, request, image_id, *args, **kwargs):
         # ดึงข้อมูลรูปภาพที่ต้องการลบ
         image = get_object_or_404(ProductImage, id=image_id)
 

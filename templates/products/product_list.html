@@ -26,7 +26,7 @@
                        name="search"
                        id="search"
                        placeholder="ค้นหาชื่อสินค้า"
-                       value="{{ query }}"
+                       value="{{ request.GET.search  }}"
                        class="px-4 py-2 border border-gray-300 rounded-md w-full"/>
             </div>
 
@@ -35,6 +35,13 @@
                     class="bg-blue-500 text-white px-4 py-2 rounded-md shadow flex-shrink-0 hover:bg-blue-600 transition">
                 ค้นหา
             </button>
+
+            <!-- ลิงก์รีเซ็ต -->
+            <a href="{% url 'product_list' %}"
+               class="border border-gray-400 text-gray-700 px-4 py-2 rounded-md shadow-sm hover:bg-gray-100 hover:text-gray-900 transition duration-300 whitespace-nowrap text-center">
+                รีเซ็ต
+            </a>
+
         </form>
         
         <!-- ปุ่มเพิ่มสินค้า -->
@@ -56,7 +63,7 @@
             <thead>
                 <tr class="bg-gray-300 text-gray-700">
                     <th class="px-6 py-3">รหัสสินค้า</th> 
-                    <th class="px-6 py-3">ชื่อสินค้า</th>
+                    <th class="px-6 py-3 w-80">ชื่อสินค้า</th>
                     <th class="px-6 py-3">ประเภทสินค้า</th>
                     <th class="px-6 py-3">ราคา<span class="text-gray-700 font-medium ml-2">(ต่ำสุด - สูงสุด)</span></th>
                     <th class="px-6 py-3 text-center">จัดการ</th>
@@ -98,7 +105,7 @@
                 {% empty %}
                 <tr>
                     <td colspan="5" class="px-6 py-3 text-center text-gray-500">
-                        ไม่พบผลลัพธ์ที่ตรงกับคำค้นหาของคุณ
+                        ไม่มีสินค้า
                     </td>
                 </tr>
                 {% endfor %}
@@ -107,7 +114,7 @@
     </div>
 
     <!-- Pagination -->
-    {% include "components/admin/pagination.html" with page_obj=page_obj query=query selected_category=selected_category %}
+    {% include "components/admin/pagination.html" with page_obj=page_obj query_params=query_params %}
 
 </div>
 

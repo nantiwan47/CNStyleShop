@@ -2,12 +2,17 @@ from django.db import models
 from accounts.models import UserProfile
 from orders.models import OrderItem
 from products.models import Product
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Review(models.Model):
-    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name='order_item_reviews')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_reviews')
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='user_reviews')
     comment = models.TextField()
+    # rating = models.PositiveSmallIntegerField(
+    #     validators=[MinValueValidator(1), MaxValueValidator(5)],
+    #     null=True, blank=True
+    # )
     analysis_done = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -21,13 +26,29 @@ class ReviewAnalysis(models.Model):
         ("neutral", "เป็นกลาง"),
     ]
 
-    review = models.OneToOneField(Review, on_delete=models.CASCADE)
+    review = models.OneToOneField(Review, on_delete=models.CASCADE, related_name="analysis")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="analyses")
     score = models.FloatField()
     polarity = models.CharField(max_length=50, choices=POLARITY_CHOICES, default='neutral')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"การวิเคราะห์รีวิว {self.review.id} - ขั้วอารมณ์: {self.polarity}"
+
+class ReviewSentiment(models.Model):
+    SENTIMENT_CHOICES = [
+        ('positive', 'คำเชิงบวก'),
+        ('negative', 'คำเชิงลบ'),
+    ]
+
+    analysis = models.ForeignKey(ReviewAnalysis, on_delete=models.CASCADE, related_name="sentiments")
+    sentiment_type = models.CharField(max_length=10, choices=SENTIMENT_CHOICES)
+    word = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"{self.sentiment_type.capitalize()} Word: {self.word}"
+
+
 
 # class ReviewPositive(models.Model):
 #     analysis = models.ForeignKey(ReviewAnalysis, on_delete=models.CASCADE)
@@ -36,16 +57,3 @@ class ReviewAnalysis(models.Model):
 # class ReviewNegative(models.Model):
 #     analysis = models.ForeignKey(ReviewAnalysis, on_delete=models.CASCADE)
 #     negative = models.CharField(max_length=255)
-
-class ReviewSentiment(models.Model):
-    SENTIMENT_CHOICES = [
-        ('positive', 'คำเชิงบวก'),
-        ('negative', 'คำเชิงลบ'),
-    ]
-
-    analysis = models.ForeignKey(ReviewAnalysis, on_delete=models.CASCADE)
-    sentiment_type = models.CharField(max_length=10, choices=SENTIMENT_CHOICES)
-    word = models.CharField(max_length=255)
-
-    def __str__(self):
-        return f"{self.sentiment_type.capitalize()} Word: {self.word}"

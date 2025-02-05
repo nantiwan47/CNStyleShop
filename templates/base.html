@@ -7,15 +7,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CN Style Shop</title>
-    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
+
+    {% block extra_head %}
+
+
+    {% endblock %}
+
 </head>
 <body class="bg-gray-200">
     {% include 'components/user/header.html' %}
     
-    <main class="mt-18 px-8 pt-8">
-        {% block content %}
-        {% endblock %}
+    <main class="mx-20 mt-[72px] px-8 pt-8">
+            {% block content %}
+            {% endblock %}
     </main>
+
+    <!-- JavaScript Libraries -->
+    <script src="https://unpkg.com/htmx.org@1.8.4"></script>
 
 </body>
 </html>

@@ -17,8 +17,9 @@ class OrderItemAdmin(admin.ModelAdmin):
     def total_price(self, obj):
         return obj.quantity * obj.unit_price
     total_price.short_description = 'ราคารวม'
+
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('order_code', 'full_name', 'total_price', 'colored_status')
+    list_display = ('order_code', 'full_name', 'total_price', 'colored_status', 'order_date')
 
     def colored_status(self, obj):
         color_map = {

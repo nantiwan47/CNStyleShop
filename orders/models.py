@@ -3,6 +3,8 @@ from accounts.models import UserProfile
 from products.models import Product
 import uuid
 from datetime import datetime
+from django.utils import timezone
+
 
 # ฟังก์ชันสำหรับกำหนดเส้นทางการอัปโหลดรูปภาพของสลิปโอนเงิน
 def upload_to(instance,filename):
@@ -28,12 +30,12 @@ class Order(models.Model):
 
     STATUS = (
         ('pending', 'รอการชำระเงิน'),
-        ('paid', 'ชำระเงินแล้ว,'),
+        ('paid', 'ชำระเงินแล้ว'),
         ('completed', 'สำเร็จ'),
         ('cancelled', 'ยกเลิก'),
     )
 
-    order_code = models.CharField(max_length=20, unique=True, editable=False)
+    order_code = models.CharField(max_length=20, unique=True, editable=False) # ,
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='orders')
     full_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=10)
@@ -43,7 +45,7 @@ class Order(models.Model):
     payment_method = models.CharField(max_length=50, choices=PaymentMethod)
     payment_image = models.ImageField(upload_to=upload_to, blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS, default='pending')
-    order_date = models.DateTimeField(auto_now_add=True)
+    order_date = models.DateTimeField(default=timezone.now, db_index=True)
 
     def __str__(self):
         return f"หมายเลขคำสั่งซื้อ: {self.order_code} - ชื่อ: {self.full_name} | ราคารวม: {self.total_price} บาท | สถานะ: {self.get_status_display()}"
@@ -60,7 +62,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='products')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items')
     quantity = models.IntegerField()
     color = models.CharField(max_length=50)
     size = models.CharField(max_length=50)

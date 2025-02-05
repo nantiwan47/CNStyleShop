@@ -1,6 +1,6 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
-from django.views.generic import *
+from django.views.generic import CreateView
 from django.contrib import messages
 from .forms import UserRegisterForm, AdminRegistrationForm
 from .models import UserProfile
@@ -20,16 +20,22 @@ class UserLoginView(LoginView):
     template_name = 'accounts/login.html'
 
     def get_success_url(self):
+        # ดึงค่า next จาก URL หากมี
+        next_url = self.request.GET.get('next')
+
         # ตรวจสอบ role ของผู้ใช้
         if self.request.user.role == 'user':
-            return reverse_lazy('home')
+            if next_url:
+                return next_url  # ไปที่หน้าที่ผู้ใช้พยายามเข้าถึง
+            else:
+                return reverse_lazy('home')
 
         # เพิ่มข้อความแจ้งเตือน
         messages.error(self.request, "กรุณาล็อกอินด้วยบัญชีผู้ใช้")
         return reverse_lazy('login')
 
 class UserLogoutView(LogoutView):
-    next_page = reverse_lazy('login')
+    next_page = reverse_lazy('home')
 
 class AdminRegisterView(CreateView):
     model = UserProfile
@@ -60,8 +66,7 @@ class AdminLoginView(LoginView):
             if next_url:
                 return next_url  # ไปที่หน้าที่ผู้ใช้พยายามเข้าถึง
             else:
-                # return reverse_lazy('dashboard')
-                return reverse_lazy('product_list')
+                return reverse_lazy('dashboard')
 
         # เพิ่มข้อความแจ้งเตือน และกลับไปหน้า login ของแอดมิน
         messages.error(self.request, "กรุณาล็อกอินด้วยบัญชีแอดมิน")

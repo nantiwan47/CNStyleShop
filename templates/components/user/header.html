@@ -1,5 +1,5 @@
-<header class="fixed top-0 left-0 z-30 w-full bg-white border-b border-gray-200 px-6 py-2 shadow-sm">
-        <div class="container mx-auto px-4 py-2 flex justify-between items-center">
+<header class="fixed top-0 left-0 z-30 w-full bg-white border-b border-gray-200 px-6 py-1 shadow-sm">
+        <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex flex-row">
                 <!-- Logo -->
                 <div class="flex items-center space-x-2">
@@ -11,12 +11,12 @@
     
                 <!-- Navigation -->
                 <nav class="hidden md:flex space-x-6 items-center ml-5">
-                    <a href="#" class="text-gray-600 hover:text-red-500 text-md">บทความ</a>
+                    <a href="{% url 'articles' %}" class="text-gray-600 hover:text-red-500 text-md">บทความ</a>
                 </nav>
             </div>
             
             
-            <div class="flex flex-row mr-4 w-2/5">
+            <div class="flex flex-row mr-4 w-2/5 items-center">
                 <!-- Search-->
                 <div class="flex-1 mx-4">
                     <form method="GET" action="#" class="relative">
@@ -50,11 +50,37 @@
                          </a>
 
                      <!-- User Icon -->
-                         <a href="#" class="text-red-500 hover:text-red-600">
-                             <img src="{{ user.profile_picture.url }}" alt="Profile picture of {{ user.username }}" 
-                                class="w-8 h-8 object-cover rounded-full border-2 border-gray-400 hover:scale-105 transition-transform duration-300"
-                             >
-                        </a>
+                        <div class="dropdown dropdown-hover dropdown-end">
+                            <label tabindex="0" class="btn btn-ghost btn-circle avatar relative m-2">
+                                <div class="w-10 h-10 border border-gray-300 hover:border-gray-400 rounded-full overflow-hidden">
+                                    <img src="{{ user.profile_picture.url }}" alt="Profile picture of {{ user.username }}" class="object-cover w-full h-full rounded-full">
+                                </div>
+                            </label>
+
+                            <ul tabindex="0" class="dropdown-content text-base text-gray-700 z-[1] menu p-2 bg-white border border-gray-300 shadow rounded-lg w-52">
+                                 <li>
+                                    <a href="#" class="flex items-center p-2 px-3 rounded-md">
+                                        โปรไฟล์ของฉัน
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="#" class="flex items-center p-2 px-3 rounded-md">
+                                        สถานะการสั่งซื้อ
+                                    </a>
+                                </li>
+                                <li>
+                                    <button id="logoutBtn" class="flex items-center gap-2 p-2 rounded-md text-red-600">
+                                        <span class="w-6 h-6 flex items-center justify-center">
+                                            <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                               <path d="M7.5 18H4.16667C3.72464 18 3.30072 17.8244 2.98816 17.5118C2.67559 17.1993 2.5 16.7754 2.5 16.3333V4.66667C2.5 4.22464 2.67559 3.80072 2.98816 3.48816C3.30072 3.17559 3.72464 3 4.16667 3H7.5M13.3333 14.6667L17.5 10.5M17.5 10.5L13.3333 6.33333M17.5 10.5H7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </span>
+                                        ออกจากระบบ
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+
                      </div>
                 {% else %}
                     <!-- ยังไม่ login -->
@@ -68,6 +94,6 @@
         </div>
     </header>
 
-{% include 'components/alert/logout_dialog.html' %}
+{% include 'components/alert/logout_dialog_user.html' %}
 
 <script src="{% static 'js/accounts/logoutDialog.js' %}"></script>

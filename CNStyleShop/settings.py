@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "articles",
     "orders",
     "dashboard",
+    "shop",
 
     "tailwind",
     "theme",
@@ -136,13 +137,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = 'th'
 
-TIME_ZONE = "Asia/Bangkok"
+TIME_ZONE = "Asia/Bangkok" # ใช้เวลาประเทศไทยโดยตรง
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -162,11 +163,13 @@ MEDIA_ROOT = BASE_DIR / 'media'  # โฟลเดอร์เก็บไฟล
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 TINYMCE_DEFAULT_CONFIG = {
-    'height': 300,  # ความสูงของ editor
+    'height': 400,  # ความสูงของ editor
     'width': 'auto',  # ปรับให้เหมาะกับพื้นที่
     'toolbar': 'undo redo |fontsize forecolor backcolor |bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist',  # เครื่องมือพื้นฐาน
     'menubar': False,  # ปิดเมนูด้านบน
     'plugins': 'lists',  # เพิ่มปลั๊กอิน lists
     'branding': False,  # ซ่อนโลโก้ TinyMCE
+    'content_style': 'body {  background-color: #f5f5f5; }',  # กำหนดสีพื้นหลังและกรอบ
+
 }
 

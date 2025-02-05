@@ -1,24 +1,21 @@
 import time
-from django.shortcuts import render, redirect
-from django.contrib import messages
-import requests
 from datetime import datetime, timedelta
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from .models import Review, ReviewAnalysis, ReviewSentiment
+
+import requests
+from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.views.decorators.http import require_POST
+from django.db.models import Count, F, Max, Q, Sum
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.utils.timezone import now
+from django.views import View
+from django.views.generic import ListView, TemplateView
 
-@login_required(login_url='/account/admin-login')
-def dashboard(request):
-    # ดึงข้อมูลการวิเคราะห์ทั้งหมด
-    analysis_results = ReviewAnalysis.objects.all().select_related('review').prefetch_related('reviewsentiment_set')
+from orders.models import Order, OrderItem
+from products.models import Product
+from .models import Review, ReviewAnalysis, ReviewSentiment
 
-    # ส่งข้อมูลไปยัง template
-    context = {
-        'analysis_results': analysis_results,
-    }
-    return render(request, 'dashboard/dashboard.html', context)
 
 def handle_rate_limit(response):
     """ ฟังก์ชันจัดการเมื่อเกิน Rate Limit และการแจ้งเตือนเวลาที่จะรีเซ็ต"""
@@ -62,6 +59,7 @@ def process_review_analysis(session, review, api_url, headers):
             # 1. บันทึกผลลัพธ์การวิเคราะห์ลงใน ReviewAnalysis
             review_analysis = ReviewAnalysis.objects.create(
                 review=review,
+                product=review.product,
                 score=float(sentiment.get('score', 0.0)),
                 polarity=sentiment.get('polarity', 'neutral') or 'neutral'
             )
@@ -99,34 +97,211 @@ def process_review_analysis(session, review, api_url, headers):
     # ไม่มีข้อผิดพลาดเกิดขึ้น
     return None
 
-@require_POST
-def analyze_reviews(request):
-    # ดึงคอมเม้นต์ที่ยังไม่วิเคราะห์
-    reviews = Review.objects.filter(analysis_done=False)
+class AnalyzeReviewsView(View):
+    def post(self, request, *args, **kwargs):
+        # ดึงคอมเม้นต์ที่ยังไม่วิเคราะห์
+        reviews = Review.objects.filter(analysis_done=False)
 
-    # กรณีไม่มีรีวิวที่ต้องวิเคราะห์
-    if not reviews.exists():
-        messages.success(request, 'ข้อมูลจากการวิเคราะห์รีวิวสินค้าล่าสุดแล้ว')
+        # ถ้าไม่มีรีวิวที่ต้องวิเคราะห์
+        if not reviews.exists():
+            messages.info(request, 'ข้อมูลจากการวิเคราะห์รีวิวสินค้าล่าสุดแล้ว')
+            return redirect('dashboard')
+
+        api_url = "https://api.aiforthai.in.th/ssense"
+        headers = {
+            'Apikey': "JqezYBpyzRy5YrTHTTG2uMXorbtvCQ6W"
+        }
+
+        # ใช้ Session เพื่อลดการเปิด/ปิด HTTP Connection
+        with requests.Session() as session:
+            for review in reviews:
+                # ประมวลผลการวิเคราะห์
+                result = process_review_analysis(session, review, api_url, headers)
+
+                # หากเกิดข้อผิดพลาด
+                if result:
+                    messages.error(request, f'เกิดข้อผิดพลาดในการวิเคราะห์รีวิว กรุณาลองใหม่อีกครั้งในเวลา: {result}')
+                    return redirect('dashboard')
+
+        # วิเคราะห์รีวิวเสร็จสมบูรณ์
+        messages.success(request, f'วิเคราะห์รีวิว {reviews.count()} รายการเสร็จสิ้น')
         return redirect('dashboard')
 
-    api_url = "https://api.aiforthai.in.th/ssense"
-    headers = {
-        'Apikey': "JqezYBpyzRy5YrTHTTG2uMXorbtvCQ6W"
-    }
-    # ใช้ Session เพื่อเพิ่มประสิทธิภาพ ลดการเปิด/ปิดการเชื่อมต่อ HTTP
-    with requests.Session() as session:
-        for review in reviews:
-            # เรียกใช้ฟังก์ชันวิเคราะห์รีวิว
-            result = process_review_analysis(session, review, api_url, headers)
+class DashboardView(LoginRequiredMixin, TemplateView):
+    login_url = 'admin_login'
+    template_name = 'dashboard/dashboard.html'
 
-            # หากเกิดข้อผิดพลาดระหว่างการวิเคราะห์
-            if result:
-                messages.error(request, f'เกิดข้อผิดพลาดในการวิเคราะห์รีวิว กรูณาลองใหม่อีกครั้งในเวลา: {result}')
-                return redirect('dashboard')
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
 
-    # กรณีวิเคราะห์รีวิวเสร็จสมบูรณ์
-    messages.success(request, f'วิเคราะห์รีวิว {len(reviews)} รายการเสร็จสิ้น')
-    return redirect('dashboard')
+        today = now().date()
+
+        # 1. คำนวณยอดขายที่ status = 'completed' ของเดือนปัจจุบัน
+        total_sales = Order.objects.filter(
+            status="completed",
+            order_date__year=today.year,   # เฉพาะปีปัจจุบัน
+            order_date__month=today.month, # เฉพาะเดือนปัจจุบัน
+        ).aggregate(Sum("total_price"))["total_price__sum"] or 0
+
+        # 2. จำนวนสินค้าทั้งหมด
+        total_products = Product.objects.count()
+
+        # 3. จำนวนออเดอร์วันนี้
+        orders_today = Order.objects.filter(order_date__date=today).count()
+
+        # 4. หมวดหมู่สินค้าที่ขายดีที่สุดในเดือนนี้ (กี่ชิ้น)
+        best_category = (
+            OrderItem.objects.filter(
+                order__status="completed",
+                order__order_date__year=today.year, # เฉพาะปีปัจจุบัน
+                order__order_date__month=today.month # เฉพาะเดือนปัจจุบัน
+            )
+            .select_related('product') # ดึงข้อมูล Product มาพร้อมกัน ผ่านฟิลด์ product ของตาราง OrderItem
+            .values(category=F("product__category")) # ดึง category จาก Product แล้วเปลี่ยนชื่อคอลัมน์เป็น category
+            .annotate(total_quantity=Sum("quantity")) # รวมจำนวนสินค้าที่ขายได้ ตามหมวดหมู่
+            .order_by("-total_quantity")  # เรียงจากมากไปน้อย
+        )
+
+        # #ับจำนวนรีวิวที่ยังไม่ได้วิเคราะห์
+        unprocessed_review_count = Review.objects.filter(analysis_done=False).count()
+
+        # หาวันที่มีการวิเคราะห์ล่าสุด
+        latest_analysis_time = ReviewAnalysis.objects.aggregate(latest_time=Max('created_at'))['latest_time']
+
+        # 5. วิเคราะห์ความคิดเห็นสินค้าทั้งหมด
+        total_reviews_product = ReviewAnalysis.objects.count()  # นับจำนวนความคิดเห็นทั้งหมด
+
+        # นับจำนวนรีวิวแต่ละประเภท (positive, neutral, negative)
+        sentiment_counts = ReviewAnalysis.objects.values('polarity').annotate(count=Count('id'))
+
+        # สร้าง dictionary สำหรับเก็บเปอร์เซ็นต์
+        sentiment_percentages = {
+            'positive': 0,
+            'neutral': 0,
+            'negative': 0
+        }
+
+        # ถ้ามีรีวิวทั้งหมด
+        if total_reviews_product > 0:
+            for item in sentiment_counts:
+                sentiment_percentages[item['polarity']] = round((item['count'] / total_reviews_product) * 100, 2)
+
+        # 6. วิเคราะห์ความคิดเห็นตามประเภทสินค้า
+        review_summary = Product.objects.values('category').annotate(
+            total_reviews=Count('analyses'),
+            positive_reviews=Count('analyses', filter=Q(analyses__polarity='positive')),
+            negative_reviews=Count('analyses', filter=Q(analyses__polarity='negative')),
+            neutral_reviews=Count('analyses', filter=Q(analyses__polarity='neutral'))
+        ).order_by('category')
+
+        result = []
+        for item in review_summary:
+            total_reviews = item['total_reviews']
+
+            # คำนวณเปอร์เซ็นต์
+            positive_percentage = (item['positive_reviews'] / total_reviews) * 100 if total_reviews > 0 else 0
+            negative_percentage = (item['negative_reviews'] / total_reviews) * 100 if total_reviews > 0 else 0
+            neutral_percentage = (item['neutral_reviews'] / total_reviews) * 100 if total_reviews > 0 else 0
+
+            result.append({
+                'category': item['category'],
+                'total_reviews': total_reviews,
+                'positive_reviews': item['positive_reviews'],
+                'negative_reviews': item['negative_reviews'],
+                'neutral_reviews': item['neutral_reviews'],
+
+                'positive_percentage': round(positive_percentage, 2),  # ปัดเศษเป็นทศนิยม 2 ตำแหน่ง
+                'negative_percentage': round(negative_percentage, 2),  # ปัดเศษเป็นทศนิยม 2 ตำแหน่ง
+                'neutral_percentage': round(neutral_percentage, 2)  # ปัดเศษเป็นทศนิยม 2 ตำแหน่ง
+            })
+
+        context.update(
+            {
+                "total_sales": total_sales,
+                "total_products": total_products,
+                "orders_today": orders_today,
+                "best_category": best_category,
+                "total_reviews_product": total_reviews_product,
+                "unprocessed_review_count": unprocessed_review_count,
+                "latest_analysis_time": latest_analysis_time,
+                "sentiment_percentages": dict(sentiment_percentages),
+                "result": result,
+
+            }
+        )
+        return context
+
+class ProductAnalysisListView(LoginRequiredMixin, ListView):
+    login_url = 'admin_login'
+    model = Product
+    template_name = 'dashboard/product_analysis.html'
+    context_object_name = 'products'
+    paginate_by = 2
+
+    def get_queryset(self):
+        queryset = Product.objects.annotate(
+            total_reviews=Count('product_reviews')
+        ).filter(total_reviews__gt=0).prefetch_related(
+            'product_reviews',  # ดึงรีวิวทั้งหมดของสินค้า
+            'analyses',                 # ดึงการวิเคราะห์ของแต่ละสินค้า
+            'analyses__sentiments'      # ดึงคำเชิงบวก/ลบ จากการวิเคราะห์
+        )
+
+        # รับค่าค้นหาจาก Query Parameters
+        search_query = self.request.GET.get('search', '').strip()
+        if search_query:
+            queryset = queryset.filter(
+                Q(id__icontains=search_query) |  # ค้นหาตามรหัสสินค้า
+                Q(name__icontains=search_query) | # ค้นหาตามชื่อสินค้า
+                Q(analyses__sentiments__word__icontains=search_query)  # ค้นหาจากคำเชิงบวก/ลบ
+            )
+
+        return queryset.order_by('id')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # คำนวณข้อมูลรีวิวและการวิเคราะห์
+        for product in context['products']:
+            reviews = product.product_reviews.all()  # ดึงรีวิวทั้งหมดของสินค้า
+            total_reviews = reviews.count()
+
+            # คำนวณเปอร์เซ็นต์ของรีวิวที่เป็นบวก, ลบ, และเป็นกลาง
+            analysis = product.analyses.all()  # ดึงการวิเคราะห์ของสินค้า
+            positive_reviews = analysis.filter(polarity='positive').count()
+            negative_reviews = analysis.filter(polarity='negative').count()
+            neutral_reviews = analysis.filter(polarity='neutral').count()
+
+            positive_percentage = (positive_reviews / total_reviews * 100) if total_reviews else 0
+            negative_percentage = (negative_reviews / total_reviews * 100) if total_reviews else 0
+            neutral_percentage = (neutral_reviews / total_reviews * 100) if total_reviews else 0
+
+            # คำนวณคำเชิงบวกและเชิงลบ
+            positive_words = {}
+            negative_words = {}
+
+            for analysis_item in analysis:  # ใช้ข้อมูลจากที่โหลดมาแล้ว
+                for sentiment in analysis_item.sentiments.all():  # ดึงคำเชิงบวก/ลบจาก prefetch_related
+                    if sentiment.sentiment_type == 'positive':
+                        positive_words[sentiment.word] = positive_words.get(sentiment.word, 0) + 1
+                    else:
+                        negative_words[sentiment.word] = negative_words.get(sentiment.word, 0) + 1
+
+            # เก็บข้อมูลลงใน product
+            product.review_data = {
+                'total_reviews': total_reviews,
+                'positive_percentage': positive_percentage,
+                'negative_percentage': negative_percentage,
+                'neutral_percentage': neutral_percentage,
+                'positive_word_count': positive_words,
+                'negative_word_count': negative_words,
+            }
+
+        query_params = self.request.GET.copy()  # คัดลอก query parameters
+        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page' ถ้ามี
+        context['query_params'] = query_params.urlencode()  # แปลงเป็น query string
+
+        return context
 
 
 # ทดสอบในการใช้ api แบบหลายๆ รอบ
@@ -139,8 +314,6 @@ def test(request):
 
     data = {'text': text}
 
-
-    # ใช้ with requests.Session() เพื่อสร้าง session
     with requests.Session() as session:
         for i in range(122):
             print(f"Processing review #{i + 1}...")
