@@ -1,7 +1,7 @@
 {% if messages %}
     {% for message in messages %}
         <div id="alert-{{ message.tags }}"
-            class="flex items-center p-2 px-6 mb-2 mt-2 rounded-lg
+            class="flex items-center p-2 px-6 mb-2 mt-2 rounded-lg mx-6
                 {% if message.tags == 'success' %} text-green-800 bg-green-100
                 {% elif message.tags == 'error' %} text-red-800 bg-red-100
                 {% elif message.tags == 'info' %} text-blue-800 bg-blue-100
@@ -38,11 +38,11 @@
 {% endif %}
 
 <script>
-    // ตั้งเวลาปิดข้อความอัตโนมัติใน 5 วินาที
+    // ตั้งเวลาปิดข้อความอัตโนมัติใน 10 วินาที
     setTimeout(function() {
         let alerts = document.querySelectorAll('[id^="alert-"]');
         alerts.forEach(alert => {
             alert.style.display = 'none';
         });
-    }, 5000);
+    }, 10000);
 </script>

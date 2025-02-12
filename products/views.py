@@ -39,7 +39,7 @@ class ProductListView(LoginRequiredMixin, ListView):
     login_url = 'admin_login'
     model = Product
     template_name = "products/product_list.html"
-    paginate_by = 1  # แบ่งหน้า 10 รายการ
+    paginate_by = 10  # แบ่งหน้า 10 รายการ
 
     def get_queryset(self):
         # รับค่าค้นหาจาก URL

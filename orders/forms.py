@@ -1,5 +1,6 @@
 from django import forms
 from .models import Order
+from .models import Order, OrderItem
 
 class OrderFilterForm(forms.Form):
     STATUS_CHOICES = [('', '--- สถานะทั้งหมด ---')] + list(Order.STATUS)
@@ -38,3 +39,8 @@ class OrderFilterForm(forms.Form):
             'type': 'date'
         })
     )
+
+class OrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['full_name', 'phone', 'address', 'payment_method', 'payment_image']

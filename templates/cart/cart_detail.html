@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-6">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">🛒 ตะกร้าสินค้า</h1>
+
+    {% if items %}
+    <table class="w-full border-collapse border border-gray-200">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="p-3 border">สินค้า</th>
+                <th class="p-3 border">ราคา</th>
+                <th class="p-3 border">จำนวน</th>
+                <th class="p-3 border">รวม</th>
+                <th class="p-3 border">ลบ</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr class="text-center">
+                <td class="p-3 border flex items-center space-x-3">
+                    <img src="{{ item.product.cover_image.url  }}" alt="{{ item.product.name }}"
+                         class="w-16 h-16 object-cover rounded">
+                    <div class="text-left">
+                        <p class="font-semibold">{{ item.product.name }}</p>
+                        <p class="text-gray-500">{{ item.product_option.color }} / {{ item.product_option.size }}</p>
+                    </div>
+                </td>
+                <td class="p-3 border text-red-500">฿{{ item.product_option.price }}</td>
+               <td class="p-3 border">
+                    <div class="flex items-center justify-center">
+                        <!-- ปุ่มลดจำนวน -->
+                        <button type="button" onclick="updateQuantity({{ item.id }}, 'decrease', this)"
+                                class="px-2 py-1 border rounded bg-gray-200 text-gray-700">−</button>
+
+                        <!-- ช่องแสดงจำนวน -->
+                        <span id="quantity-{{ item.id }}" class="mx-2">{{ item.quantity }}</span>
+
+                        <!-- ปุ่มเพิ่มจำนวน -->
+                        <button type="button" onclick="updateQuantity({{ item.id }}, 'increase', this)"
+                                class="px-2 py-1 border rounded bg-gray-200 text-gray-700">+</button>
+                    </div>
+                </td>
+
+
+                <td class="p-3 border text-green-600 total-price" id="item-total-{{ item.id }}">
+                    ฿{{ item.item_price }}
+                </td>
+
+                <td class="p-3 border">
+                    <a href="{% url 'remove_cart_item' item.id %}"
+                       class="text-red-500 hover:underline">❌</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- ปุ่ม Checkout -->
+    <div class="flex justify-end mt-6">
+        <p class="text-xl font-semibold mr-4">💰 ยอดรวม: <span id="cart-total">฿{{ cart.get_total_price }}</span></p>
+        <a href="{% url 'checkout' %}"
+           class="bg-red-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-red-600">
+            🏷️ ดำเนินการสั่งซื้อ
+        </a>
+    </div>
+
+    {% else %}
+    <p class="text-center text-gray-600">ไม่มีสินค้าในตะกร้า 🛍️</p>
+    {% endif %}
+</div>
+
+<script>
+    function updateQuantity(itemId, action, button) {
+        fetch(`/cart/update/${itemId}/`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: `action=${action}`
+        })
+        .then(response => response.json())
+        .then(data => {
+        if (data.quantity !== undefined) {
+            // อัปเดตจำนวนสินค้า
+            document.getElementById(`quantity-${itemId}`).textContent = data.quantity;
+            // อัปเดตราคารวมของสินค้านั้น
+            document.getElementById(`item-total-${itemId}`).textContent = `฿${data.item_total}`;
+            // อัปเดตราคารวมทั้งหมดของตะกร้า
+            document.getElementById("cart-total").textContent = `฿${data.cart_total}`;
+        }
+    })
+        .catch(error => console.error("Error:", error));
+    }
+</script>
+
+
+{% endblock %}

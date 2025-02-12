@@ -54,7 +54,7 @@
     </div>
 
     <!-- แสดง messages success-->
-    {% include "components/alert/success_alert.html" with errors=messages %}
+    {% include "components/alert/alert_message.html" with messages=messages %}
 
     <!-- ตารางแสดงบทความ -->
     <div class="overflow-x-auto rounded-lg shadow-lg">
@@ -102,7 +102,7 @@
                     </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="px-6 py-3 text-center text-gray-500">
+                    <td colspan="6" class="px-6 py-3 text-center text-gray-500">
                         ไม่มีบทความ
                     </td>
                 </tr>

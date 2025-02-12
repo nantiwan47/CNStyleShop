@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "orders",
     "dashboard",
     "shop",
+    "cart",
 
     "tailwind",
     "theme",
@@ -102,7 +103,7 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'test',               # ชื่อ Schema ที่สร้างใน Workbench
+#         'NAME': 'cnstyleshop',               # ชื่อ Schema ที่สร้างใน Workbench
 #         'USER': 'root',               # ชื่อผู้ใช้ที่สร้างไว้
 #         'PASSWORD': 'root',           # รหัสผ่านของผู้ใช้
 #         'HOST': '127.0.0.1',          # ใช้ localhost หรือ IP เซิร์ฟเวอร์

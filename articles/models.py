@@ -14,7 +14,7 @@ class Article(models.Model):
     CATEGORY_CHOICES = [
         ('lifestyle', 'ไลฟ์สไตล์'),
         ('news', 'ข่าวสาร'),
-        ('product recommendatons', 'แนะนำสินค้า'),
+        ('recommendatons', 'แนะนำสินค้า'),
     ]
 
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='articles')

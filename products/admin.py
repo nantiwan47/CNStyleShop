@@ -29,7 +29,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 @admin.register(ProductOption)
 class ProductOptionAdmin(admin.ModelAdmin):
-    list_display = ('product', 'color', 'size', 'price')
+    list_display = ('id', 'product', 'color', 'size', 'price')
     list_filter = ('product', 'color', 'size')
     search_fields = ('product__name', 'color', 'size')
 

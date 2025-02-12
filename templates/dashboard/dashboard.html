@@ -66,7 +66,7 @@
         </div>
 
         <!-- Feedback Analysis -->
-        <div class=" bg-white shadow-md rounded-lg overflow-hidden w-full px-6 pb-6 col-span-2 ">
+        <div class=" bg-white shadow-md rounded-lg overflow-hidden w-full pb-6 col-span-2 ">
             <div class="flex justify-between items-center border-b-2 border-gray-300 py-4 px-6 ">
                 <div>
                     <!-- Title Section -->
@@ -94,7 +94,7 @@
                     </div>
                 </div>
 
-                <!-- Analyze Reviews Button -->
+                <!-- Analyze Reviews Button  analyze_reviews -->
                 <form action="{% url 'analyze_reviews' %}" method="POST">
                     {% csrf_token %}
                     <button type="submit" class="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition duration-300 ease-in-out">
@@ -149,6 +149,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {% for data in result %}
+
                 <div class="bg-stone-100 shadow-md rounded-lg overflow-hidden p-6">
                     <h3 class="text-md font-semibold mb-2">{{ data.category|capfirst }}</h3>
                     <p class="text-gray-600 text-xs mb-2">จำนวนรีวิวทั้งหมด {{ data.total_reviews }} ข้อความ</p>

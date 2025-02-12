@@ -95,7 +95,7 @@
                     </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="px-6 py-3 text-center text-gray-500">
+                    <td colspan="8" class="px-6 py-3 text-center text-gray-500">
                         ไม่มีสินค้าที่มีการวิเคราะห์ข้อความรีวิว
                     </td>
                 </tr>
@@ -108,57 +108,5 @@
     {% include "components/admin/pagination.html" with page_obj=page_obj query_params=query_params %}
 
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<table>
-    <thead>
-        <tr>
-            <th>สินค้า</th>
-            <th>จำนวนรีวิวทั้งหมด</th>
-            <th>รีวิวเชิงบวก (%)</th>
-            <th>รีวิวเชิงลบ (%)</th>
-            <th>รีวิวเป็นกลาง (%)</th>
-            <th>คำเชิงบวก</th>
-            <th>คำเชิงลบ</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for product in products %}
-        <tr>
-            <td>{{ product.name }}</td>  <!-- ชื่อสินค้า -->
-            <td>{{ product.review_data.total_reviews }}</td>
-            <td>{{ product.review_data.positive_percentage|floatformat:2 }}%</td>
-            <td>{{ product.review_data.negative_percentage|floatformat:2 }}%</td>
-            <td>{{ product.review_data.neutral_percentage|floatformat:2 }}%</td>
-            <td>
-                {% for word, count in product.review_data.positive_word_count.items %}
-                    {{ word }} ({{ count }})<br>
-                {% empty %}
-                    ไม่มี
-                {% endfor %}
-            </td>
-            <td>
-                {% for word, count in product.review_data.negative_word_count.items %}
-                    {{ word }} ({{ count }})<br>
-                {% empty %}
-                    ไม่มี
-                {% endfor %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
 
 {% endblock %}

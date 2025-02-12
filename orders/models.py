@@ -41,7 +41,7 @@ class Order(models.Model):
     phone = models.CharField(max_length=10)
     address = models.TextField()
     total_price = models.IntegerField()
-    shipping_method = models.ForeignKey(ShippingMethod, on_delete=models.CASCADE)
+    # shipping_method = models.ForeignKey(ShippingMethod, on_delete=models.CASCADE)
     payment_method = models.CharField(max_length=50, choices=PaymentMethod)
     payment_image = models.ImageField(upload_to=upload_to, blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS, default='pending')
@@ -69,7 +69,7 @@ class OrderItem(models.Model):
     unit_price = models.IntegerField()
 
     def __str__(self):
-        return f"หมายเลขคำสั่งซื้อ: {self.order.order_code} | สินค้า: {self.product.name} - จำนวน: {self.quantity} | สี: {self.color} | ขนาด: {self.size} | ราคาต่อหน่วย: {self.unit_price} บาท"
+        return f"{self.id} | หมายเลขคำสั่งซื้อ: {self.order.order_code} | สินค้า: {self.product.name} - จำนวน: {self.quantity} | สี: {self.color} | ขนาด: {self.size} | ราคาต่อหน่วย: {self.unit_price} บาท"
 
     @property
     def total_price(self):

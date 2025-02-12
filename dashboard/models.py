@@ -3,18 +3,24 @@ from accounts.models import UserProfile
 from orders.models import OrderItem
 from products.models import Product
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db.models import Avg
 
 class Review(models.Model):
     order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name='order_item_reviews')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_reviews')
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='user_reviews')
     comment = models.TextField()
-    # rating = models.PositiveSmallIntegerField(
-    #     validators=[MinValueValidator(1), MaxValueValidator(5)],
-    #     null=True, blank=True
-    # )
+    rating = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        null=True, blank=True
+    )
     analysis_done = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    @classmethod
+    def get_average_rating(cls, product):
+        """ ดึงค่าเฉลี่ยของคะแนนรีวิวของสินค้า """
+        return cls.objects.filter(product=product).aggregate(avg_rating=Avg('rating'))['avg_rating'] or 0
 
     def __str__(self):
         return f"รีวิว ID: {self.id} โดย {self.user.username}"
@@ -46,7 +52,7 @@ class ReviewSentiment(models.Model):
     word = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"{self.sentiment_type.capitalize()} Word: {self.word}"
+        return f"วิเคราะห์ ID: {self.analysis.id} | {self.sentiment_type.capitalize()} Word: {self.word}"
 
 
 

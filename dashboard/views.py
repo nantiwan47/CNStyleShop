@@ -120,7 +120,7 @@ class AnalyzeReviewsView(View):
 
                 # หากเกิดข้อผิดพลาด
                 if result:
-                    messages.error(request, f'เกิดข้อผิดพลาดในการวิเคราะห์รีวิว กรุณาลองใหม่อีกครั้งในเวลา: {result}')
+                    messages.error(request, f'เกิดข้อผิดพลาดในการวิเคราะห์ข้อความรีวิว กรุณาลองใหม่อีกครั้งในเวลา: {result}')
                     return redirect('dashboard')
 
         # วิเคราะห์รีวิวเสร็จสมบูรณ์
@@ -192,7 +192,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             positive_reviews=Count('analyses', filter=Q(analyses__polarity='positive')),
             negative_reviews=Count('analyses', filter=Q(analyses__polarity='negative')),
             neutral_reviews=Count('analyses', filter=Q(analyses__polarity='neutral'))
-        ).order_by('category')
+        ).filter(total_reviews__gt=0).order_by('category')
 
         result = []
         for item in review_summary:
@@ -236,24 +236,26 @@ class ProductAnalysisListView(LoginRequiredMixin, ListView):
     model = Product
     template_name = 'dashboard/product_analysis.html'
     context_object_name = 'products'
-    paginate_by = 2
+    paginate_by = 10
 
     def get_queryset(self):
         queryset = Product.objects.annotate(
-            total_reviews=Count('product_reviews')
-        ).filter(total_reviews__gt=0).prefetch_related(
-            'product_reviews',  # ดึงรีวิวทั้งหมดของสินค้า
-            'analyses',                 # ดึงการวิเคราะห์ของแต่ละสินค้า
-            'analyses__sentiments'      # ดึงคำเชิงบวก/ลบ จากการวิเคราะห์
+            total_analyses=Count('analyses')  # นับจำนวนการวิเคราะห์ที่เกี่ยวข้องกับสินค้าแต่ละตัวจาก related_name analyses ของตาราง ReviewAnalysis
+        ).filter(total_analyses__gt=0)  # แสดงเฉพาะสินค้าที่มีการวิเคราะห์แล้ว
+
+        queryset = queryset.prefetch_related(
+            'product_reviews',  # โหลดรีวิวของสินค้า
+            'analyses',  # โหลดข้อมูลการวิเคราะห์ที่เกี่ยวข้องกับสินค้า
+            'analyses__sentiments'  # โหลดข้อมูลความรู้สึกจากการวิเคราะห์ของสินค้านั้นๆ
         )
 
         # รับค่าค้นหาจาก Query Parameters
         search_query = self.request.GET.get('search', '').strip()
         if search_query:
             queryset = queryset.filter(
-                Q(id__icontains=search_query) |  # ค้นหาตามรหัสสินค้า
-                Q(name__icontains=search_query) | # ค้นหาตามชื่อสินค้า
-                Q(analyses__sentiments__word__icontains=search_query)  # ค้นหาจากคำเชิงบวก/ลบ
+                Q(id__icontains=search_query) |
+                Q(name__icontains=search_query) |
+                Q(analyses__sentiments__word__icontains=search_query)
             )
 
         return queryset.order_by('id')
@@ -261,33 +263,30 @@ class ProductAnalysisListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # คำนวณข้อมูลรีวิวและการวิเคราะห์
+        # วนลูปแต่ละสินค้าเฉพาะรีวิวที่ถูกวิเคราะห์แล้วเท่านั้นจาก queryset
         for product in context['products']:
-            reviews = product.product_reviews.all()  # ดึงรีวิวทั้งหมดของสินค้า
+            reviews = product.analyses.all()  # ดึงข้อมูลการวิเคราะห์รีวิวของสินค้านั้น จาก ReviewAnalysis
             total_reviews = reviews.count()
 
-            # คำนวณเปอร์เซ็นต์ของรีวิวที่เป็นบวก, ลบ, และเป็นกลาง
-            analysis = product.analyses.all()  # ดึงการวิเคราะห์ของสินค้า
-            positive_reviews = analysis.filter(polarity='positive').count()
-            negative_reviews = analysis.filter(polarity='negative').count()
-            neutral_reviews = analysis.filter(polarity='neutral').count()
+            positive_reviews = reviews.filter(polarity='positive').count()
+            negative_reviews = reviews.filter(polarity='negative').count()
+            neutral_reviews = reviews.filter(polarity='neutral').count()
 
             positive_percentage = (positive_reviews / total_reviews * 100) if total_reviews else 0
             negative_percentage = (negative_reviews / total_reviews * 100) if total_reviews else 0
             neutral_percentage = (neutral_reviews / total_reviews * 100) if total_reviews else 0
 
-            # คำนวณคำเชิงบวกและเชิงลบ
             positive_words = {}
             negative_words = {}
 
-            for analysis_item in analysis:  # ใช้ข้อมูลจากที่โหลดมาแล้ว
-                for sentiment in analysis_item.sentiments.all():  # ดึงคำเชิงบวก/ลบจาก prefetch_related
+            # วนลูปแต่ละการวิเคราะห์ของสินค้า
+            for analysis_item in reviews:
+                for sentiment in analysis_item.sentiments.all(): # วนลูปความรู้สึกที่เกี่ยวข้องกับการวิเคราะห์นั้นๆ
                     if sentiment.sentiment_type == 'positive':
                         positive_words[sentiment.word] = positive_words.get(sentiment.word, 0) + 1
                     else:
                         negative_words[sentiment.word] = negative_words.get(sentiment.word, 0) + 1
 
-            # เก็บข้อมูลลงใน product
             product.review_data = {
                 'total_reviews': total_reviews,
                 'positive_percentage': positive_percentage,
@@ -297,9 +296,9 @@ class ProductAnalysisListView(LoginRequiredMixin, ListView):
                 'negative_word_count': negative_words,
             }
 
-        query_params = self.request.GET.copy()  # คัดลอก query parameters
-        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page' ถ้ามี
-        context['query_params'] = query_params.urlencode()  # แปลงเป็น query string
+        query_params = self.request.GET.copy()
+        query_params.pop('page', None)
+        context['query_params'] = query_params.urlencode()
 
         return context
 

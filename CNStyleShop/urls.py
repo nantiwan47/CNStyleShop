@@ -29,13 +29,15 @@ urlpatterns = [
 
     path('', include('shop.urls')),
 
+    path('cart/', include('cart.urls')),
+
     path('account/', include('accounts.urls')),
 
     path('admin/', include('products.urls')),
 
-    path('admin/', include('articles.urls')),
+    path('', include('articles.urls')), # มีทั้งส่วนของแอดมินและผู้้ใช้
 
-    path('admin/', include('orders.urls')),
+    path('', include('orders.urls')), # มีทั้งส่วนของแอดมินและผู้้ใช้
 
     path('admin/', include('dashboard.urls')),
 ]
