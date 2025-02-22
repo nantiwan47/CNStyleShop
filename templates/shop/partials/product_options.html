@@ -6,10 +6,11 @@
 
     <!-- ราคา -->
     <div class="text-red-500 text-3xl font-bold mt-4">฿{{ price }}</div>
-    <h3 class="mt-4 font-semibold">เลือกสี</h3>
-    <div class="flex flex-wrap gap-2 mt-3">
+    <div class="flex flex-wrap items-center gap-2 mt-6">
+        <h3 class="w-20">เลือกสี</h3>
+
         {% for color in all_colors %}
-            <button class="w-16 h-12 border-2 rounded-lg text-md flex items-center justify-center transition duration-200 ease-in-out hover:shadow focus:outline-none
+            <button class="w-auto h-10 px-4 border-2 rounded-lg text-md flex items-center justify-center transition duration-200 ease-in-out hover:shadow focus:outline-none
                    {% if color == selected_color %} bg-red-100 text-red-600 border-red-500 font-semibold {% else %} border-gray-200 text-gray-700 {% endif %}
                    {% if color not in available_colors %} bg-gray-200 text-gray-300 cursor-not-allowed {% endif %}"
                     hx-get="{% url 'product-option' product_id %}?color={{ color }}{% if selected_size %}&size={{ selected_size }}{% endif %}"
@@ -22,10 +23,10 @@
         {% endfor %}
     </div>
 
-    <h3 class="mt-4 font-semibold">เลือกขนาด</h3>
-    <div class="flex flex-wrap gap-2 mt-3">
+    <div class="flex flex-wrap items-center gap-2 mt-6">
+        <h3 class="w-20" >เลือกขนาด</h3>
         {% for size in all_sizes %}
-            <button class="w-16 h-12 border-2 rounded-lg text-md flex items-center justify-center transition duration-200 ease-in-out hover:shadow focus:outline-none
+            <button class="w-auto h-10 px-4 border-2 rounded-lg text-md flex items-center justify-center transition duration-200 ease-in-out hover:shadow focus:outline-none
                    {% if size == selected_size %} bg-red-100 text-red-600 border-red-500 font-semibold {% else %}  border-gray-200 text-gray-700 {% endif %}
                    {% if size not in available_sizes %} bg-gray-200 text-gray-300 cursor-not-allowed {% endif %}"
                     hx-get="{% url 'product-option' product_id %}?size={{ size }}{% if selected_color %}&color={{ selected_color }}{% endif %}"

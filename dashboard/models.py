@@ -53,13 +53,3 @@ class ReviewSentiment(models.Model):
 
     def __str__(self):
         return f"วิเคราะห์ ID: {self.analysis.id} | {self.sentiment_type.capitalize()} Word: {self.word}"
-
-
-
-# class ReviewPositive(models.Model):
-#     analysis = models.ForeignKey(ReviewAnalysis, on_delete=models.CASCADE)
-#     positive = models.CharField(max_length=255)
-#
-# class ReviewNegative(models.Model):
-#     analysis = models.ForeignKey(ReviewAnalysis, on_delete=models.CASCADE)
-#     negative = models.CharField(max_length=255)

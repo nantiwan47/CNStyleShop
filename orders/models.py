@@ -30,7 +30,7 @@ class Order(models.Model):
 
     STATUS = (
         ('pending', 'รอการชำระเงิน'),
-        ('paid', 'ชำระเงินแล้ว'),
+        ('paid', 'จ่ายแล้ว'),
         ('completed', 'สำเร็จ'),
         ('cancelled', 'ยกเลิก'),
     )
@@ -46,6 +46,7 @@ class Order(models.Model):
     payment_image = models.ImageField(upload_to=upload_to, blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS, default='pending')
     order_date = models.DateTimeField(default=timezone.now, db_index=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"หมายเลขคำสั่งซื้อ: {self.order_code} - ชื่อ: {self.full_name} | ราคารวม: {self.total_price} บาท | สถานะ: {self.get_status_display()}"

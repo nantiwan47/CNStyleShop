@@ -14,7 +14,7 @@ def upload_gallery(instance, filename):
 # ตารางสินค้า
 class Product(models.Model):
     CATEGORY_CHOICES = [
-        ('blouse', 'เสื้้อเบล้าส์(เสื้อผู้หญิง)'),
+        ('blouse', 'เสื้อเบล้าส์'),
         ('dress', 'ชุดเดรส'),
         ('jacket', 'แจ็คเก็ต'),
         ('jeans', 'ยีนส์'),

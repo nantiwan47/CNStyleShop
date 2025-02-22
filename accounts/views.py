@@ -1,8 +1,9 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.views.generic import CreateView, UpdateView, TemplateView
 from django.contrib import messages
-from .forms import UserRegisterForm, AdminRegistrationForm
+from .forms import UserRegisterForm, AdminRegistrationForm, UserProfileForm
 from .models import UserProfile
 from typing import cast
 
@@ -11,10 +12,6 @@ class UserRegisterView(CreateView):
     form_class = UserRegisterForm
     template_name = 'accounts/register.html'
     success_url = reverse_lazy('login')
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
 
 class UserLoginView(LoginView):
     template_name = 'accounts/login.html'
@@ -75,4 +72,22 @@ class AdminLoginView(LoginView):
 class AdminLogoutView(LogoutView):
     next_page = reverse_lazy('admin_login')
 
+class ProfileView(LoginRequiredMixin, TemplateView):
+    login_url = 'login'
+    template_name = 'accounts/profile.html'
+
+class ProfileUpdateView(LoginRequiredMixin, UpdateView):
+    login_url = 'login'
+    model = UserProfile
+    form_class = UserProfileForm
+    template_name = 'accounts/profile_edit.html'
+    success_url = reverse_lazy('profile')
+
+    def form_valid(self, form):
+        # เมื่อฟอร์มถูกบันทึกสำเร็จ
+        messages.success(self.request, "ข้อมูล Profile ถูกอัปเดตเรียบร้อยแล้ว")
+        return super().form_valid(form)
+
+    def get_object(self, queryset=None):
+        return self.request.user  # ให้โหลดข้อมูลของ user ที่ล็อกอินอยู่
 

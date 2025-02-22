@@ -1,17 +1,21 @@
-<!-- JavaScript สำหรับควบคุมการแสดง/ซ่อนกล่องไดอะล็อก -->
-const logoutBtn = document.getElementById('logoutBtn');
-const logoutDialog = document.getElementById('logoutDialog');
-const cancelBtn = document.getElementById('cancelBtn');
+// JavaScript สำหรับควบคุมการแสดง/ซ่อนกล่องไดอะล็อก
 
-// ตรวจสอบการมีอยู่ของปุ่มก่อนที่จะเพิ่ม event listener
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-        logoutDialog.classList.remove('hidden');
-    });
-}
+document.addEventListener('DOMContentLoaded', function() {
 
-if (cancelBtn) {
-    cancelBtn.addEventListener('click', () => {
-        logoutDialog.classList.add('hidden');
+    const logoutBtns = document.querySelectorAll('.logoutBtn')
+    const logoutDialog = document.getElementById('logoutDialog');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    // วนลูปผ่านทุกปุ่ม ที่มี class="logoutBtn" ก่อนที่จะเพิ่ม event listener
+     logoutBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            logoutDialog.classList.remove('hidden');
+        });
     });
-}
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            logoutDialog.classList.add('hidden');
+        });
+    }
+});

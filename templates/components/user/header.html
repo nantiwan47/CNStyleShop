@@ -5,12 +5,12 @@
             <div class="flex flex-row">
                 <!-- Logo -->
                 <div class="flex items-center space-x-2">
-                    <a href="{% url 'home' %}" class="flex items-center group">
+                    <a href="{% url 'shop' %}" class="flex items-center group">
                         {% load static %}
                         <img src="{% static 'images/logo/X_Black_Logo.svg' %}" alt="CNStyleShop Logo" class="h-12 w-auto">
                     </a>
                 </div>
-    
+
                 <!-- Navigation -->
                 <nav class="hidden md:flex space-x-6 items-center ml-5">
                     <a href="{% url 'articles' %}" class="text-gray-600 hover:text-red-500 text-md">บทความ</a>
@@ -21,10 +21,14 @@
             <div class="flex flex-row mr-4 w-2/5 items-center">
                 <!-- Search-->
                 <div class="flex-1 mx-4">
-                    <form method="GET" action="#" class="relative">
+                    <form method="GET" action="{% url 'search_results' %}" class="relative">
+                        <input type="hidden" name="category" value="{{ request.GET.category }}">
+                        <input type="hidden" name="min_price" value="{{ request.GET.min_price }}">
+                        <input type="hidden" name="max_price" value="{{ request.GET.max_price }}">
                         <input 
                             type="text" 
-                            name="search" 
+                            name="search"
+                            value="{{ request.GET.search }}"
                             placeholder="ค้นหาสินค้า" 
                             class="text-gray-700 bg-gray-200 text-sm rounded-full px-4 py-2 focus:outline-none w-full border-none"
                         />
@@ -69,17 +73,17 @@
 
                             <ul tabindex="0" class="dropdown-content text-base text-gray-700 z-[1] menu p-2 bg-white border border-gray-300 shadow rounded-lg w-52">
                                  <li>
-                                    <a href="#" class="flex items-center p-2 px-3 rounded-md">
-                                        โปรไฟล์ของฉัน
+                                    <a href="{% url 'profile' %}" class="flex items-center p-2 px-3 rounded-md">
+                                        บัญชีของฉัน
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" class="flex items-center p-2 px-3 rounded-md">
+                                    <a href="{% url 'my_orders' %}" class="flex items-center p-2 px-3 rounded-md">
                                         สถานะการสั่งซื้อ
                                     </a>
                                 </li>
                                 <li>
-                                    <button id="logoutBtn" class="flex items-center gap-2 p-2 rounded-md text-red-600">
+                                    <button class="logoutBtn flex items-center gap-2 p-2 rounded-md text-red-600">
                                         <span class="w-6 h-6 flex items-center justify-center">
                                             <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                <path d="M7.5 18H4.16667C3.72464 18 3.30072 17.8244 2.98816 17.5118C2.67559 17.1993 2.5 16.7754 2.5 16.3333V4.66667C2.5 4.22464 2.67559 3.80072 2.98816 3.48816C3.30072 3.17559 3.72464 3 4.16667 3H7.5M13.3333 14.6667L17.5 10.5M17.5 10.5L13.3333 6.33333M17.5 10.5H7.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>

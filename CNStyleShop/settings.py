@@ -174,3 +174,8 @@ TINYMCE_DEFAULT_CONFIG = {
 
 }
 
+# ALLOWED_HOSTS = [
+#     'eb31-49-231-194-157.ngrok-free.app',
+#     'localhost',
+#     '127.0.0.1'
+# ]

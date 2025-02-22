@@ -62,3 +62,67 @@ class AdminRegistrationForm(UserCreationForm):
     #     if commit:
     #         user.save()
     #     return user
+
+# แบบฟอร์มสำหรับการแก้ไขโพรไฟล์สำหรับผู้ใช้
+class UserProfileForm(forms.ModelForm):
+
+    profile_picture = forms.ImageField(
+        required=False,
+        widget=forms.FileInput(attrs={
+            'class': 'file-input file-input-bordered file-input-sm w-full max-w-xs mt-2',
+            'accept': '.jpg, .jpeg, .png',
+        })
+    )
+
+    username = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 w-full border-gray-300 rounded-md sm:text-sm focus:ring-gray-500 focus:border-gray-500',
+        })
+    )
+
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            'class': 'mt-1 w-full border-gray-300 rounded-md sm:text-sm focus:ring-gray-500 focus:border-gray-500',
+        })
+    )
+
+    phone_number = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'mt-1 w-full border-gray-300 rounded-md sm:text-sm focus:ring-gray-500 focus:border-gray-500',
+        })
+    )
+
+    birthday = forms.DateField(
+        required=False,
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+        })
+    )
+
+    GENDER_CHOICES = [
+        ('male', 'ชาย'),
+        ('female', 'หญิง'),
+        ('other', 'อื่น ๆ'),
+    ]
+
+    gender = forms.ChoiceField(
+        required=False,
+        choices=GENDER_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': ''
+        })
+    )
+
+    address = forms.CharField(
+        required=False,
+        widget=forms.Textarea(attrs={
+            'class': 'mt-1 w-full border-gray-300 rounded-md sm:text-sm focus:ring-gray-500 focus:border-gray-500',
+            'rows': 3
+        })
+    )
+
+    class Meta:
+        model = UserProfile
+        fields = ['profile_picture', 'username', 'email', 'phone_number', 'birthday', 'gender', 'address']
+

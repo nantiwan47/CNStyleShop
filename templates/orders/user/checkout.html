@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="min-h-screen pb-10">
-    <div class="w-full p-3 bg-white rounded-md shadow mb-4 text-xl font-bold">
-        <h1 class="mx-6">หน้าทำการสั่งซื้อ</h1>
+<div class="min-h-screen pb-10 ">
+    <div class="w-full p-2 shadow-lg mb-4 text-md text-white font-semibold bg-gray-700 sticky top-[72px]">
+        <h1 class="mx-10">หน้าทำการสั่งซื้อ</h1>
     </div>
 
     <div class="max-w-4xl mx-auto p-10 bg-white shadow-lg rounded-lg">
@@ -14,8 +14,8 @@
                 <thead>
                     <tr class="text-left text-gray-600 border-b">
                         <th class="p-3">สินค้า</th>
-                        <th class="p-3 text-right">ราคาต่อหน่วย</th>
-                        <th class="p-3 text-center">จำนวน</th>
+                        <th class="p-3 text-right">ราคาต่อชิ้น</th>
+                        <th class="p-3 text-right">จำนวน</th>
                         <th class="p-3 text-right">ราคารวม</th>
                     </tr>
                 </thead>
@@ -27,11 +27,11 @@
                                 class="w-16 h-16 rounded-lg object-cover">
                             <div>
                                 <p class="text-gray-800 font-medium">{{ item.product.name }}</p>
-                                <p class="text-gray-500 text-sm">สี: {{ item.product_option.color }}, Size: {{ item.product_option.size }}</p>
+                                <p class="text-gray-500 text-sm">{{ item.product_option.color }}, {{ item.product_option.size }}</p>
                             </div>
                         </td>
                         <td class="p-3 text-right text-gray-800">฿{{ item.product_option.price }}</td>
-                        <td class="p-3 text-center text-gray-800">
+                        <td class="p-3 text-right text-gray-800">
                             <span class="border px-3 py-1 rounded-md bg-gray-100">{{ item.quantity }}</span>
                         </td>
                         <td class="p-3 text-right font-semibold text-gray-900">฿{{ item.item_price }}</td>
@@ -43,7 +43,7 @@
     </div>
 
     <!-- ฟอร์มสั่งซื้อ -->
-    <div class="max-w-4xl mx-auto mt-6 p-10 bg-white shadow-lg rounded-lg">
+    <div class="max-w-4xl mx-auto mt-4 p-10 bg-white shadow-lg rounded-lg">
         <h2 class="text-lg font-semibold text-red-700 mb-4">ข้อมูลการจัดส่ง</h2>
         <form method="post">
             {% csrf_token %}
@@ -67,7 +67,7 @@
                     ที่อยู่สำหรับจัดส่ง
                     <span class="text-gray-500 text-xs block mt-1">บ้านเลขที่, ซอย, หมู่, ถนน, แขวง/ตำบล, เขต/อำเภอ, จังหวัด, รหัสไปรษณีย์</span>
                 </label>
-                <textarea id="address" name="address" rows="4"
+                <textarea id="address" name="address" rows="3"
                     class="mt-2 p-3 w-full border border-gray-300 rounded-lg shadow-sm focus:ring-red-500 focus:border-red-500 transition ease-in-out duration-200 placeholder-gray-400"
                     placeholder="กรอกที่อยู่ของคุณที่นี่...">{{ user.address }}</textarea>
             </div>
@@ -87,11 +87,10 @@
 
                 <!-- ยอดชำระเงิน -->
                 <div class="md:ml-8 w-full md:w-1/2 flex justify-between items-center p-4 bg-gray-100 border border-gray-300 rounded-md shadow-sm">
-                    <span class="text-gray-600 text-lg font-medium">ยอดชำระเงินทั้งหมด</span>
+                    <span class="text-gray-600 text-lg font-medium">ยอดรวมทั้งหมด</span>
                     <span class="text-2xl text-red-500 font-bold">฿{{ total_price }}</span>
                 </div>
             </div>
-
 
             <!-- ซ่อนค่าที่ต้องส่งไปกับคำสั่งซื้อ (เฉพาะ BuyNowView) -->
             <input type="hidden" name="option_id" value="{{ items.0.product_option.id }}">
@@ -100,7 +99,7 @@
 
             <!-- ปุ่มยืนยัน -->
             <button type="submit"
-                class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-3 rounded-lg text-lg mt-6 border-2 border-red-700">
+                class="w-full bg-red-500 hover:bg-red-600 text-white font-semibold py-1 rounded-lg text-md mt-6 border-2 border-red-700">
                 สั่งสินค้า
             </button>
         </form>

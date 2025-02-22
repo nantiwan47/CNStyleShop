@@ -2,10 +2,11 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.views.generic import ListView, DetailView, FormView, TemplateView
 from django.views import View
+from markdown_it.common.html_re import comment
 
 from cart.models import Cart
 from dashboard.models import Review
@@ -14,8 +15,7 @@ from .forms import OrderFilterForm
 from .models import Order, OrderItem
 from .forms import OrderForm
 
-from django.http import HttpResponseRedirect
-
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 
 
 class OrderListView(LoginRequiredMixin, ListView):
@@ -214,22 +214,84 @@ class PaymentView(LoginRequiredMixin, View):
             order.payment_image = slip
             order.status = "paid"  # เปลี่ยนสถานะเป็นจ่ายแล้ว
             order.save()
-            messages.success(request, "อัปโหลดสลิปสำเร็จ! คำสั่งซื้อของคุณได้รับการชำระเงินแล้ว")
-            return redirect("home")
+            # messages.success(request, "อัปโหลดสลิปสำเร็จ! คำสั่งซื้อของคุณได้รับการชำระเงินแล้ว")
+            return redirect(f"{reverse('my_orders')}?tab=paid")
 
-        messages.error(request, "กรุณาแนบสลิปการโอนเงิน")
+        # messages.error(request, "กรุณาแนบสลิปการโอนเงิน")
         return redirect("payment", order_id=order.id)
 
-class MyOrdersView(LoginRequiredMixin, TemplateView):
+class MyOrdersView(LoginRequiredMixin, ListView):
     template_name = "orders/user/my_orders.html"
+    context_object_name = "items"
+    paginate_by = 10
+
+    ORDER_TABS = {
+        "pending": "รอการชำระเงิน",
+        "paid": "รอการอนุมัติ",
+        "completed": "สำเร็จ",
+        "cancelled": "ยกเลิก",
+        "reviews": "ประวัติรีวิว"
+    }
+
+    def get_queryset(self):
+        """ กำหนด queryset ตามแท็บที่เลือก """
+        tab = self.request.GET.get("tab", "pending")  # ค่าเริ่มต้นเป็น 'pending'
+        self.current_tab = tab  # เก็บค่าแท็บปัจจุบันเพื่อใช้ใน context
+
+        if tab == "reviews":
+            return Review.objects.filter(user=self.request.user).order_by("-created_at")
+        return Order.objects.filter(user=self.request.user, status=tab).order_by("-updated_at")
 
     def get_context_data(self, **kwargs):
+        """ เพิ่มค่า tab และ item_type เข้าไปใน context """
         context = super().get_context_data(**kwargs)
-        user = self.request.user
 
-        context["pending_orders"] = Order.objects.filter(user=user, status="pending")
-        context["paid_orders"] = Order.objects.filter(user=user, status="paid")
-        context["completed_orders"] = Order.objects.filter(user=user, status="completed")
-        context["cancelled_orders"] = Order.objects.filter(user=user, status="cancelled")
-        context["reviews"] = Review.objects.filter(user=user)
+        query_params = self.request.GET.copy()  # คัดลอก query parameters
+        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page' ถ้ามีอยู่ เพื่อป้องกันค่าหน้าเก่าถูกส่งไป
+
+        context["tabs"] = self.ORDER_TABS
+        context["current_tab"] = self.current_tab
+        context["item_type"] = "review" if self.current_tab == "reviews" else "order"
+        context['query_params'] = query_params.urlencode()  # แปลงเป็น query string ที่ใช้ใน URL
+
         return context
+
+class CancelOrderView(LoginRequiredMixin, View):
+    login_url = 'login'
+
+    def post(self, request, order_id):
+        order = get_object_or_404(Order, id=order_id)
+
+        if order.status == 'pending':
+            # เปลี่ยนสถานะของคำสั่งซื้อเป็น 'cancelled'
+            order.status = 'cancelled'
+            order.save()
+
+        return HttpResponse(status=204)
+
+class ReviewView(LoginRequiredMixin, View):
+    def get(self, request, item_id):
+        """ ดึงฟอร์มรีวิวและแสดงเป็น modal """
+        order_item = get_object_or_404(OrderItem, id=item_id)
+        return render(request, 'orders/user/review_form.html', {'order_item': order_item})
+
+    def post(self, request, item_id):
+
+        order_item = get_object_or_404(OrderItem, id=item_id)
+        rating = int(request.POST.get("rating"))
+        comment = request.POST.get("comment")
+
+        # บันทึกรีวิว
+        review = Review.objects.create(
+            order_item=order_item,
+            product=order_item.product,
+            user=request.user,
+            rating=rating,
+            comment=comment
+        )
+        return redirect(f"{reverse('my_orders')}?tab=completed")
+
+
+
+
+

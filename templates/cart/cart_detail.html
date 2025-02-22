@@ -1,73 +1,92 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="max-w-5xl mx-auto bg-white shadow-lg rounded-lg p-6">
-    <h1 class="text-2xl font-bold text-gray-800 mb-4">🛒 ตะกร้าสินค้า</h1>
+<div class="min-h-screen max-w-6xl mx-auto pb-10 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Cart Items Section -->
+    <div class="md:col-span-2 bg-white shadow-lg rounded-lg p-6 sm:p-10 h-fit">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">รถเข็นของคุณ</h1>
 
-    {% if items %}
-    <table class="w-full border-collapse border border-gray-200">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="p-3 border">สินค้า</th>
-                <th class="p-3 border">ราคา</th>
-                <th class="p-3 border">จำนวน</th>
-                <th class="p-3 border">รวม</th>
-                <th class="p-3 border">ลบ</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in items %}
-            <tr class="text-center">
-                <td class="p-3 border flex items-center space-x-3">
-                    <img src="{{ item.product.cover_image.url  }}" alt="{{ item.product.name }}"
-                         class="w-16 h-16 object-cover rounded">
-                    <div class="text-left">
-                        <p class="font-semibold">{{ item.product.name }}</p>
-                        <p class="text-gray-500">{{ item.product_option.color }} / {{ item.product_option.size }}</p>
-                    </div>
-                </td>
-                <td class="p-3 border text-red-500">฿{{ item.product_option.price }}</td>
-               <td class="p-3 border">
-                    <div class="flex items-center justify-center">
-                        <!-- ปุ่มลดจำนวน -->
-                        <button type="button" onclick="updateQuantity({{ item.id }}, 'decrease', this)"
-                                class="px-2 py-1 border rounded bg-gray-200 text-gray-700">−</button>
+        {% if items %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm sm:text-base">
+                <thead>
+                    <tr class="text-gray-700 shadow-sm border-b">
+                        <th class="p-3 text-left">สินค้า</th>
+                        <th class="p-3">ราคา</th>
+                        <th class="p-3">จำนวน</th>
+                        <th class="p-3">รวม</th>
+                        <th class="p-3"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr class="text-center border-b">
+                        <td class="p-3 flex items-center space-x-3 text-left">
+                            <a href="{% url 'product_detail' pk=item.product.id %}">
+                                <img src="{{ item.product.cover_image.url }}" alt="{{ item.product.name }}" class="w-16 h-16 object-cover rounded shadow">
+                            </a>
+                            <div>
+                                <p class="font-semibold">{{ item.product.name }}</p>
+                                <p class="text-gray-500 text-sm">{{ item.product_option.color }}, {{ item.product_option.size }}</p>
+                            </div>
+                        </td>
+                        <td class="p-3">฿{{ item.product_option.price }}</td>
+                        <td class="p-3">
+                            <div class="flex items-center justify-between bg-white rounded-full border-2 border-gray-200 px-4 py-1 mx-6 h-10">
+                                <!-- ปุ่มลดจำนวน -->
+                                <button type="button" onclick="updateQuantity({{ item.id }}, 'decrease', this)"
+                                        class="text-gray-500 flex items-center justify-center w-6 h-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 12H5" />
+                                    </svg>
+                                </button>
 
-                        <!-- ช่องแสดงจำนวน -->
-                        <span id="quantity-{{ item.id }}" class="mx-2">{{ item.quantity }}</span>
+                                <!-- แสดงจำนวน -->
+                                <span id="quantity-{{ item.id }}" class="font-semibold text-center w-6">{{ item.quantity }}</span>
 
-                        <!-- ปุ่มเพิ่มจำนวน -->
-                        <button type="button" onclick="updateQuantity({{ item.id }}, 'increase', this)"
-                                class="px-2 py-1 border rounded bg-gray-200 text-gray-700">+</button>
-                    </div>
-                </td>
-
-
-                <td class="p-3 border text-green-600 total-price" id="item-total-{{ item.id }}">
-                    ฿{{ item.item_price }}
-                </td>
-
-                <td class="p-3 border">
-                    <a href="{% url 'remove_cart_item' item.id %}"
-                       class="text-red-500 hover:underline">❌</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <!-- ปุ่ม Checkout -->
-    <div class="flex justify-end mt-6">
-        <p class="text-xl font-semibold mr-4">💰 ยอดรวม: <span id="cart-total">฿{{ cart.get_total_price }}</span></p>
-        <a href="{% url 'checkout' %}"
-           class="bg-red-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-red-600">
-            🏷️ ดำเนินการสั่งซื้อ
-        </a>
+                                <!-- ปุ่มเพิ่มจำนวน -->
+                                <button type="button" onclick="updateQuantity({{ item.id }}, 'increase', this)"
+                                        class="text-gray-500 flex items-center justify-center w-6 h-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </td>
+                        <td class="p-3 text-red-600 font-semibold" id="item-total-{{ item.id }}">
+                            ฿{{ item.item_price }}
+                        </td>
+                       <td class="p-3">
+                            <a href="{% url 'remove_cart_item' item.id %}" class="text-gray-500 hover:text-red-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-10">
+            <p class="text-gray-600 text-lg">ไม่มีสินค้าในรถเข็น</p>
+            <a href="{% url 'shop' %}" class="mt-4 inline-block px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600">ไปช้อปปิ้งต่อ</a>
+        </div>
+        {% endif %}
     </div>
 
-    {% else %}
-    <p class="text-center text-gray-600">ไม่มีสินค้าในตะกร้า 🛍️</p>
-    {% endif %}
+    <!-- Summary Section -->
+    <div class="bg-gradient-to-b from-gray-700 to-gray-800 shadow-lg rounded-lg p-6 sm:p-10 h-fit md:sticky md:top-[72px]">
+        <h2 class="text-xl font-semibold text-white border-b pb-3 mb-4">สรุปคำสั่งซื้อ</h2>
+        <div class="flex justify-between text-lg font-medium text-white mb-6">
+            <span>ยอดรวมทั้งหมด:</span>
+            <span id="cart-total" class="text-white font-bold text-xl">฿{{ cart.get_total_price }}</span>
+        </div>
+        <a href="{% url 'checkout' %}" class="block bg-red-500 text-white font-bold text-center px-6 py-2 rounded-lg text-lg hover:bg-red-600 w-full">
+            ชำระเงิน
+        </a>
+    </div>
 </div>
 
 <script>

@@ -1,14 +1,61 @@
+from collections import defaultdict
+
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, DetailView, View
 
 from django.shortcuts import get_object_or_404
+
+from dashboard.models import Review, ReviewAnalysis
 from products.models import Product
-from django.db.models import F, Min, Max
+from django.db.models import F, Min, Max, Count, Q, Sum
 from django.shortcuts import render
 
 class ShopListView(ListView):
     model = Product
-    template_name = 'shop/home.html'
+    template_name = 'shop/shop.html'
+    context_object_name = 'products'
+
+    def get_queryset(self):
+        return Product.objects.annotate(min_price=Min('options__price')).order_by('-created_at')[:20]
+
+class SearchResultsView(ListView):
+    model = Product
+    template_name = "shop/search_results.html"
+    context_object_name = "products"
+    paginate_by = 8
+
+    def get_queryset(self):
+        query = self.request.GET.get('search', '').strip()
+        category = self.request.GET.get('category', '')
+        min_price = self.request.GET.get("min_price")
+        max_price = self.request.GET.get("max_price")
+
+        products = Product.objects.all().annotate(min_price=Min('options__price'))
+
+        if query:
+            products = products.filter(name__icontains=query)
+
+        if category:
+            products = products.filter(category=category)
+
+        if min_price:
+            products = products.filter(min_price__gte=min_price)
+
+        if max_price:
+            products = products.filter(min_price__lte=max_price)
+
+        return products
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        query_params = self.request.GET.copy()  # คัดลอก query parameters
+        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page' ถ้ามีอยู่ เพื่อป้องกันค่าหน้าเก่าถูกส่งไป
+
+        context["categories"] = Product.CATEGORY_CHOICES
+        context['query_params'] = query_params.urlencode()  # แปลงเป็น query string ที่ใช้ใน URL
+
+        return context
 
 class ProductDetailView(DetailView):
     model = Product
@@ -17,6 +64,7 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        product = self.get_object()
         options = self.object.options.all()
 
         # ดึงรูปภาพเพิ่มเติมของสินค้า
@@ -31,12 +79,42 @@ class ProductDetailView(DetailView):
         min_price = price_range["min_price"] or 0  # ตั้งค่า 0 ถ้าไม่มีราคา
         max_price = price_range["max_price"] or 0
 
+        # สร้าง defaultdict เพื่อให้ค่าเริ่มต้นเป็น 0
+        polarity_counts = defaultdict(int, {"positive": 0, "negative": 0, "neutral": 0})
+
+        # ดึงข้อมูลการวิเคราะห์รีวิว
+        review_data = ReviewAnalysis.objects.filter(product=product).values_list("polarity")
+
+        for polarity in review_data:
+            if polarity[0]:  # ตรวจสอบว่ามีค่าหรือไม่
+                polarity_counts[polarity[0]] += 1
+
+        # กำหนดค่า default ถ้าไม่มี polarity
+        total_reviews = sum(polarity_counts.values())
+
+        # ถ้าไม่มีรีวิว ให้ทุกค่าเป็น 0%
+        if total_reviews == 0:
+            polarity_percentages = {"positive": 0, "negative": 0, "neutral": 0}
+        else:
+            polarity_percentages = {
+                key: (count / total_reviews) * 100
+                for key, count in polarity_counts.items()
+            }
+
+        average_rating = Review.get_average_rating(product)
+
+        sold_count = product.order_items.aggregate(total_sold=Sum('quantity'))["total_sold"] or 0
+
         context.update({
             "images": images,
             "colors": colors,
             "sizes": sizes,
-            "price": f"{min_price}" if min_price == max_price else f"{min_price} - {max_price}"
+            "price": f"{min_price}" if min_price == max_price else f"{min_price} - {max_price}",                "total_reviews": total_reviews,
+            "polarity_percentages": polarity_percentages,
+            "average_rating": average_rating,
+            "sold_count": sold_count,
         })
+
         return context
 
 class ProductOptionView(View):
@@ -90,3 +168,18 @@ class ProductOptionView(View):
             "selected_size": size,
             "price": price,
         })
+
+class ReviewListView(ListView):
+    model = Review
+    template_name = "shop/partials/review_list.html"
+    context_object_name = "reviews"
+    paginate_by = 5
+
+    def get_queryset(self):
+        product_id = self.kwargs.get("product_id")
+        return Review.objects.filter(product_id=product_id).order_by('-created_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["product_id"] = self.kwargs.get("product_id")  #  ส่ง id ไปที่ template ใช้
+        return context

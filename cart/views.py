@@ -88,7 +88,6 @@ class RemoveCartItemView(LoginRequiredMixin, View):
     def get(self, request, pk):
         item = get_object_or_404(CartItem, id=pk, cart__user=self.request.user)
         item.delete()
-        messages.success(request, "ลบสินค้าจากรถเข็นเรียบร้อยแล้ว!")
         return redirect("cart_detail")
 
 
