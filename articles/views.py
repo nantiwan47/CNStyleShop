@@ -14,6 +14,7 @@ from django.db.models import F
 
 
 # ส่วนของแอดมิน
+
 def delete_file(file_path):
     # ตรวจสอบว่าไฟล์ที่ต้องการลบมีอยู่จริงในระบบไฟล์หรือไม่
     if os.path.exists(file_path):
@@ -103,12 +104,23 @@ class ArticleDeleteView(LoginRequiredMixin, DeleteView):
 
 
 # ส่วนของผู้ใช้
+
 class ShopArticleListView(ListView):
     model = Article
     template_name = 'article/user/article_list.html'
     context_object_name = 'articles'
     ordering = ['-created_at']
     paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        query_params = self.request.GET.copy()  # คัดลอก query parameters
+        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page' ถ้ามีอยู่ เพื่อป้องกันค่าหน้าเก่าถูกส่งไป
+
+        context['query_params'] = query_params.urlencode()  # แปลงเป็น query string ที่ใช้ใน URL
+
+        return context
 
 class ArticleDetailView(DetailView):
     model = Article

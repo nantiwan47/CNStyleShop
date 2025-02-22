@@ -4,15 +4,16 @@
 {% block content %}
 <div class="min-h-screen flex ">
     <!-- ฟอร์มค้นหา -->
-    <div class="w-1/5 bg-white p-8 shadow-lg h-screen overflow-y-auto">
-        <h3 class="text-lg font-bold mb-4">ตัวกรองสินค้า</h3>
+    <div class="w-1/5 bg-gradient-to-b from-gray-700 to-gray-800  p-8 shadow-lg min-h-screen overflow-y-auto">
+        <h3 class="text-lg font-bold mb-4 text-white">ตัวกรองสินค้า</h3>
         <form method="get" action="{% url 'search_results' %}" class="space-y-6">
             <!-- หมวดหมู่สินค้า -->
-            <h4 class="font-semibold mb-2 border-b pb-2">หมวดหมู่</h4>
+            <h4 class="font-semibold mb-2 border-b pb-2 text-white">หมวดหมู่</h4>
             <input type="hidden" name="search" value="{{ request.GET.search }}">
             <div class="grid grid-cols-2 gap-2">
                 <label class="category-label block text-center p-2 border rounded-lg text-sm font-medium cursor-pointer
-                    {% if not request.GET.category %}bg-black text-white border-black{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-200{% endif %}"
+                    {% if not request.GET.category %}bg-red-200 text-red-600 border-red-500
+                    {% else %}bg-white text-gray-700 border-gray-300 hover:bg-red-100{% endif %}"
                     data-value="">
                     <input type="radio" name="category" value="" class="hidden"
                         {% if not request.GET.category %}checked{% endif %}>
@@ -20,7 +21,8 @@
                 </label>
                 {% for key, value in categories %}
                     <label class="category-label block text-center p-2 border rounded-lg text-sm font-medium cursor-pointer
-                        {% if request.GET.category == key %}bg-black text-white border-black{% else %}bg-white text-gray-700 border-gray-300 hover:bg-gray-200{% endif %}"
+                        {% if request.GET.category == key %}bg-red-200 text-red-600 border-red-500
+                        {% else %}bg-white text-gray-700 border-gray-300 hover:bg-red-100{% endif %}"
                         data-value="{{ key }}">
                         <input type="radio" name="category" value="{{ key }}" class="hidden"
                             {% if request.GET.category == key %}checked{% endif %}>
@@ -30,7 +32,7 @@
             </div>
 
             <!-- ตัวกรองช่วงราคา -->
-            <h4 class="font-semibold mt-6 mb-2 border-b pb-2">ช่วงราคา (บาท)</h4>
+            <h4 class="font-semibold mt-6 mb-2 border-b pb-2 text-white">ช่วงราคา (บาท)</h4>
             <div class="flex gap-2">
                 <input type="number" name="min_price" placeholder="ต่ำสุด" class="input input-bordered w-1/2"
                        value="{{ request.GET.min_price }}">
@@ -39,9 +41,9 @@
             </div>
 
             <!-- ปุ่มกรองสินค้า -->
-            <div class="flex gap-2 mt-6">
+            <div class="flex gap-2 mt-8">
                 <a href="{% url 'search_results' %}"
-                   class="w-1/2 text-center bg-transparent border-2 border-red-500 text-red-500 hover:bg-red-100 font-bold py-2 px-4 rounded">
+                    class="w-1/2 text-center bg-transparent border-2 border-gray-500 text-gray-300 hover:bg-gray-600 hover:text-white font-bold py-2 px-4 rounded">
                     ล้างค่า
                 </a>
                 <button type="submit" class="w-1/2 bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
@@ -91,13 +93,13 @@
             label.addEventListener("click", () => {
                 // รีเซ็ตปุ่มทั้งหมดให้เป็นสีปกติ
                 document.querySelectorAll(".category-label").forEach(lbl => {
-                    lbl.classList.remove("bg-black", "text-white", "border-black");
-                    lbl.classList.add("bg-white", "text-gray-700", "border-gray-300", "hover:bg-gray-200");
+                    lbl.classList.remove("bg-red-200", "text-red-600", "border-red-500");
+                    lbl.classList.add("bg-white", "text-gray-700", "border-gray-300", "hover:bg-red-100");
                 });
 
                 // เปลี่ยนสีปุ่มที่ถูกเลือก
-                label.classList.add("bg-black", "text-white", "border-black");
-                label.classList.remove("bg-white", "text-gray-700", "border-gray-300", "hover:bg-gray-200");
+                label.classList.add("bg-red-200", "text-red-600", "border-red-500");
+                label.classList.remove("bg-white", "text-gray-700", "border-gray-300", "hover:bg-red-100");
 
                 // ตั้งค่า checked ให้ input radio
                 label.querySelector("input").checked = true;
@@ -105,7 +107,5 @@
         });
     });
 </script>
-
-
 
 {% endblock %}
