@@ -110,29 +110,7 @@ DATABASES = {
         },
     },
 }
-DATABASES['default'] = DATABASES['sqlite3']
-
-# # สำหรับ sqlite
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'cnstyleshop',               # ชื่อ Schema ที่สร้างใน Workbench
-#         'USER': 'root',               # ชื่อผู้ใช้ที่สร้างไว้
-#         'PASSWORD': 'root',           # รหัสผ่านของผู้ใช้
-#         'HOST': '127.0.0.1',          # ใช้ localhost หรือ IP เซิร์ฟเวอร์
-#         'PORT': '3306',               # พอร์ตของ MySQL (ค่าเริ่มต้นคือ 3306)
-#         'OPTIONS': {
-#             'charset': 'utf8mb4',     # รองรับภาษาไทย
-#         },
-#     }
-# }
+DATABASES['default'] = DATABASES['mysql']
 
 AUTH_USER_MODEL = 'accounts.UserProfile'
 
