@@ -10,19 +10,6 @@ from django.utils import timezone
 def upload_to(instance,filename):
     return f"payments/{instance.id}_{filename}"
 
-class ShippingMethod(models.Model):
-    METHOD_CHOICES = [
-        ('car', 'รถ'),
-        ('boat', 'เรือ'),
-    ]
-
-    method_name = models.CharField(max_length=50, choices=METHOD_CHOICES)
-    cost = models.IntegerField()
-
-    def __str__(self):
-        return f"วิธีการจัดส่ง: {self.get_method_name_display()} - ราคา: {self.cost} บาท"
-
-
 class Order(models.Model):
     PaymentMethod = (
         ('slip', 'แนบสลิป'),
@@ -41,7 +28,6 @@ class Order(models.Model):
     phone = models.CharField(max_length=10)
     address = models.TextField()
     total_price = models.IntegerField()
-    # shipping_method = models.ForeignKey(ShippingMethod, on_delete=models.CASCADE)
     payment_method = models.CharField(max_length=50, choices=PaymentMethod)
     payment_image = models.ImageField(upload_to=upload_to, blank=True, null=True)
     status = models.CharField(max_length=10, choices=STATUS, default='pending')

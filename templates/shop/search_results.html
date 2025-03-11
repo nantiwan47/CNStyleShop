@@ -10,7 +10,7 @@
             <!-- หมวดหมู่สินค้า -->
             <h4 class="font-semibold mb-2 border-b pb-2 text-white">หมวดหมู่</h4>
             <input type="hidden" name="search" value="{{ request.GET.search }}">
-            <div class="grid grid-cols-2 gap-2">
+            <div class="grid lg:grid-cols-2 gap-2">
                 <label class="category-label block text-center p-2 border rounded-lg text-sm font-medium cursor-pointer
                     {% if not request.GET.category %}bg-red-200 text-red-600 border-red-500
                     {% else %}bg-white text-gray-700 border-gray-300 hover:bg-red-100{% endif %}"

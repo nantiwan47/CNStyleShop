@@ -4,7 +4,7 @@
 <div class="min-h-screen max-w-6xl mx-auto pb-10 px-4 grid grid-cols-1 md:grid-cols-3 gap-6">
     <!-- Cart Items Section -->
     <div class="md:col-span-2 bg-white shadow-lg rounded-lg p-6 sm:p-10 h-fit">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">รถเข็นของคุณ</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">รถเข็นของฉัน</h1>
 
         {% if items %}
         <div class="overflow-x-auto">
@@ -57,11 +57,14 @@
                             ฿{{ item.item_price }}
                         </td>
                        <td class="p-3">
-                            <a href="{% url 'remove_cart_item' item.id %}" class="text-gray-500 hover:text-red-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            </a>
+                            <form method="POST" action="{% url 'remove_cart_item' item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="text-gray-500 hover:text-red-700" style="background: none; border: none;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </form>
                         </td>
                     </tr>
                     {% endfor %}

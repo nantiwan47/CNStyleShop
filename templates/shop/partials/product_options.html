@@ -13,7 +13,7 @@
             <button class="w-auto h-10 px-4 border-2 rounded-lg text-md flex items-center justify-center transition duration-200 ease-in-out hover:shadow focus:outline-none
                    {% if color == selected_color %} bg-red-100 text-red-600 border-red-500 font-semibold {% else %} border-gray-200 text-gray-700 {% endif %}
                    {% if color not in available_colors %} bg-gray-200 text-gray-300 cursor-not-allowed {% endif %}"
-                    hx-get="{% url 'product-option' product_id %}?color={{ color }}{% if selected_size %}&size={{ selected_size }}{% endif %}"
+                    hx-get="{% url 'product-option' product_id %}?color={% if color == selected_color %} {% else %}{{ color }}{% endif %}{% if selected_size %}&size={{ selected_size }}{% endif %}"
                     hx-target="#product-options"
                     hx-trigger="click"
                     {% if color not in available_colors %} disabled {% endif %}
@@ -29,7 +29,7 @@
             <button class="w-auto h-10 px-4 border-2 rounded-lg text-md flex items-center justify-center transition duration-200 ease-in-out hover:shadow focus:outline-none
                    {% if size == selected_size %} bg-red-100 text-red-600 border-red-500 font-semibold {% else %}  border-gray-200 text-gray-700 {% endif %}
                    {% if size not in available_sizes %} bg-gray-200 text-gray-300 cursor-not-allowed {% endif %}"
-                    hx-get="{% url 'product-option' product_id %}?size={{ size }}{% if selected_color %}&color={{ selected_color }}{% endif %}"
+                    hx-get="{% url 'product-option' product_id %}?size={% if size == selected_size %} {% else %}{{ size }}{% endif %}{% if selected_color %}&color={{ selected_color }}{% endif %}"
                     hx-target="#product-options"
                     hx-trigger="click"
                     {% if size not in available_sizes %} disabled {% endif %}

@@ -35,8 +35,8 @@
         </h1>
 
         <p class="text-gray-500 text-sm mb-8 flex justify-between">
-            <span>เขียนโดย <span class="font-semibold text-gray-600">{{ article.user.username }}</span> |
-            {{ article.created_at|date:"j M Y" }}
+            <span>เขียนโดย <span class="font-semibold text-gray-600">
+                {{ article.user.username }}</span> | {{ article.get_category_display }} | {{ article.created_at|date:"j M Y" }}
             </span>
             <span>จำนวนการเข้าชม {{ article.views }} ครั้ง</span>
         </p>

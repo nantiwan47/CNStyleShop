@@ -9,9 +9,9 @@
         .scrollbar-hide {
             scrollbar-width: none; /* ซ่อน Scrollbar สำหรับ Firefox */
         }
-
     </style>
 {% endblock %}
+
 {% block content %}
 <div class="px-8 min-h-screen pb-6">
     <div class="flex flex-col sm:flex-row sm:justify-between items-center gap-4 mb-6">
@@ -48,26 +48,26 @@
         <table class="min-w-full bg-white text-left">
             <thead>
                 <tr class="bg-gray-300 text-gray-700 text-sm">
-                    <th class="px-6 py-3">รหัสสินค้า</th>
-                    <th class="px-6 py-3">สินค้า</th>
-                    <th class="px-6 py-3">จำนวนรีวิวทั้งหมด</th>
-                    <th class="px-6 py-3">เชิงบวก (%)</th>
-                    <th class="px-6 py-3">เป็นกลาง (%)</th>
-                    <th class="px-6 py-3">เชิงลบ (%)</th>
-                    <th class="px-6 py-3 text-center">คำเชิงบวก</th>
-                    <th class="px-6 py-3 text-center">คำเชิงลบ</th>
+                    <th class="px-2 py-3">รหัสสินค้า</th>
+                    <th class="px-4 py-3">สินค้า</th>
+                    <th class="px-2 py-3">จำนวนรีวิวทั้งหมด</th>
+                    <th class="px-2 py-3">เชิงบวก <span class="text-xs">(%)</span></th>
+                    <th class="px-2 py-3">เป็นกลาง <span class="text-xs">(%)</span></th>
+                    <th class="px-2 py-3">เชิงลบ <span class="text-xs">(%)</span></th>
+                    <th class="px-2 py-3 text-center">คำเชิงบวก</th>
+                    <th class="px-2 py-3 text-center">คำเชิงลบ</th>
                 </tr>
             </thead>
 
             <tbody id="article-list" class="divide-y divide-gray-200">
                 {% for product in products %}
                     <tr class="hover:bg-gray-50 transition">
-                        <td class="px-6 py-3">{{ product.id }}</td>
-                        <td class="px-6 py-3">{{ product.name }}</td>
-                        <td class="px-6 py-3">{{ product.review_data.total_reviews }}</td>
-                        <td class="px-6 py-3">{{ product.review_data.positive_percentage|floatformat:2  }}</td>
-                        <td class="px-6 py-3">{{ product.review_data.neutral_percentage|floatformat:2 }}</td>
-                        <td class="px-6 py-3">{{ product.review_data.negative_percentage|floatformat:2 }}</td>
+                        <td class="px-4 py-3">{{ product.id }}</td>
+                        <td class="px-4 py-3">{{ product.name }}</td>
+                        <td class="px-4 py-3">{{ product.review_data.total_reviews }}</td>
+                        <td class="px-4 py-3">{{ product.review_data.positive_percentage|floatformat:2  }}</td>
+                        <td class="px-4 py-3">{{ product.review_data.neutral_percentage|floatformat:2 }}</td>
+                        <td class="px-4 py-3">{{ product.review_data.negative_percentage|floatformat:2 }}</td>
                         <td class="border-l border-gray-200">
                             <div class="flex space-x-2 overflow-x-auto p-3 max-w-[200px] scrollbar-hide">
                                 {% for word, count in product.review_data.positive_word_count.items %}

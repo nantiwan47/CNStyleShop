@@ -60,7 +60,7 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <p class="text-gray-600 text-sm py-4">No sales data available for this month.</p>
+                <p class="text-gray-600 text-sm text-center py-4">ไม่มีข้อมูลการขายสำหรับเดือนนี้</p>
             {% endif %}
 
         </div>
@@ -95,10 +95,11 @@
                 </div>
 
                 <!-- Analyze Reviews Button  analyze_reviews -->
-                <form action="{% url 'analyze_reviews' %}" method="POST">
+                <form id="analyzeForm" action="{% url 'analyze_reviews' %}" method="POST">
                     {% csrf_token %}
                     <button type="submit" class="bg-blue-400 text-white px-4 py-2 rounded-lg hover:bg-blue-500 transition duration-300 ease-in-out">
-                        อัปเดต
+                        <span id="btnText">อัปเดต</span>
+                        <span id="spinner" class="loading loading-spinner hidden"></span>
                     </button>
                 </form>
             </div>
@@ -186,4 +187,11 @@
 
 </div>
 
+<script>
+    document.getElementById("analyzeForm").addEventListener("submit", function() {
+        document.getElementById("btnText").classList.add("hidden");
+        document.getElementById("spinner").classList.remove("hidden");
+        document.getElementById("submitBtn").disabled = true;
+    });
+</script>
 {% endblock %}

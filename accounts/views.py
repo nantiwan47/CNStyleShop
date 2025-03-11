@@ -24,14 +24,14 @@ class UserLoginView(LoginView):
             if next_url:
                 return next_url  # ไปที่หน้าที่ผู้ใช้พยายามเข้าถึง
             else:
-                return reverse_lazy('home')
+                return reverse_lazy('shop')
 
         # เพิ่มข้อความแจ้งเตือน
         messages.error(self.request, "กรุณาล็อกอินด้วยบัญชีผู้ใช้")
         return reverse_lazy('login')
 
 class UserLogoutView(LogoutView):
-    next_page = reverse_lazy('home')
+    next_page = reverse_lazy('shop')
 
 
 class AdminLoginView(LoginView):

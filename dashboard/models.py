@@ -6,7 +6,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db.models import Avg
 
 class Review(models.Model):
-    order_item = models.ForeignKey(OrderItem, on_delete=models.CASCADE, related_name='order_item_reviews')
+    order_item = models.OneToOneField(OrderItem, on_delete=models.CASCADE, related_name='order_item_reviews')
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_reviews')
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='user_reviews')
     comment = models.TextField()

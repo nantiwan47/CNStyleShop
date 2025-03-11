@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.shortcuts import get_object_or_404, redirect
 from django.http import JsonResponse
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,6 +8,21 @@ from django.views import View
 
 from products.models import Product, ProductOption
 from .models import Cart, CartItem
+
+class CartDetailView(LoginRequiredMixin, ListView):
+    login_url = 'login'
+    model = CartItem
+    template_name = "cart/cart_detail.html"
+    context_object_name = "items"
+
+    def get_queryset(self):
+        cart, created = Cart.objects.get_or_create(user=self.request.user)
+        return cart.items.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["cart"] = Cart.objects.get(user=self.request.user)
+        return context
 
 class AddToCartView(LoginRequiredMixin, View):
     login_url = 'login'
@@ -23,7 +37,7 @@ class AddToCartView(LoginRequiredMixin, View):
         # ดึงข้อมูล ProductOption โดยใช้ option_id
         product_option = get_object_or_404(ProductOption, id=option_id)
 
-        # ดึงตะกร้าของผู้ใช้หรือสร้างใหม่ถ้าไม่มี
+        # ดึงรถเข็นของผู้ใช้หรือสร้างใหม่ถ้าไม่มี
         cart, created = Cart.objects.get_or_create(user=request.user)
 
         # ตรวจสอบว่าสินค้าอยู่ในตะกร้าหรือยัง
@@ -44,24 +58,11 @@ class AddToCartView(LoginRequiredMixin, View):
         # เปลี่ยนเส้นทางกลับไปยังหน้ารายละเอียดสินค้าหรือหน้าก่อนหน้า
         return redirect('product_detail', pk=product_id)
 
-class CartDetailView(LoginRequiredMixin, ListView):
+class UpdateCartView(LoginRequiredMixin, View):
     login_url = 'login'
-    model = CartItem
-    template_name = "cart/cart_detail.html"
-    context_object_name = "items"
 
-    def get_queryset(self):
-        cart, created = Cart.objects.get_or_create(user=self.request.user)
-        return cart.items.all()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["cart"] = Cart.objects.get(user=self.request.user)
-        return context
-
-class UpdateCartView(View):
     def post(self, request, pk):
-        item = get_object_or_404(CartItem, id=pk, cart__user=self.request.user)
+        item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
         action = request.POST.get("action")
 
         if action == "increase":
@@ -85,8 +86,9 @@ class UpdateCartView(View):
 class RemoveCartItemView(LoginRequiredMixin, View):
     login_url = 'login'
 
-    def get(self, request, pk):
-        item = get_object_or_404(CartItem, id=pk, cart__user=self.request.user)
+    def post(self, request, pk):
+        # ค้นหาสินค้าในตะกร้าโดยใช้ ID และตรวจสอบว่าเป็นของผู้ใช้ที่ล็อกอิน
+        item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
         item.delete()
         return redirect("cart_detail")
 

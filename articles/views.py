@@ -27,7 +27,7 @@ class ArticleListView(LoginRequiredMixin, ListView):
     login_url = 'admin_login'
     model = Article
     template_name = 'article/admin/article_list.html'
-    paginate_by = 5 # แบ่งหน้า 10 รายการ
+    paginate_by = 10 # แบ่งหน้า 10 รายการ
 
     def get_queryset(self):
         # รับค่าค้นหาจาก URL
@@ -48,7 +48,7 @@ class ArticleListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         query_params = self.request.GET.copy()  # คัดลอก query parameters
-        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page' ถ้ามีอยู่ เพื่อป้องกันค่าหน้าเก่าถูกส่งไป
+        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page'
 
         context['selected_category'] = self.request.GET.get('category', '')
         context['category_choices'] = Article.CATEGORY_CHOICES  # ส่ง Choices ไปที่ Template

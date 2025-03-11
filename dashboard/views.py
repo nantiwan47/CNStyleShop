@@ -11,6 +11,7 @@ from django.shortcuts import redirect
 from django.utils.timezone import now
 from django.views import View
 from django.views.generic import ListView, TemplateView
+from collections import Counter
 
 from orders.models import Order, OrderItem
 from products.models import Product
@@ -226,7 +227,6 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 "latest_analysis_time": latest_analysis_time,
                 "sentiment_percentages": dict(sentiment_percentages),
                 "result": result,
-
             }
         )
         return context
@@ -239,14 +239,12 @@ class ProductAnalysisListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = Product.objects.annotate(
-            total_analyses=Count('analyses')  # นับจำนวนการวิเคราะห์ที่เกี่ยวข้องกับสินค้าแต่ละตัวจาก related_name analyses ของตาราง ReviewAnalysis
-        ).filter(total_analyses__gt=0)  # แสดงเฉพาะสินค้าที่มีการวิเคราะห์แล้ว
+        queryset = Product.objects.filter(analyses__isnull=False).distinct()  # กรองเฉพาะสินค้าที่มีการวิเคราะห์ (มีข้อมูลในตาราง ReviewAnalysis ที่เกี่ยวข้องกับสินค้านั้นๆ)
 
         queryset = queryset.prefetch_related(
-            'product_reviews',  # โหลดรีวิวของสินค้า
-            'analyses',  # โหลดข้อมูลการวิเคราะห์ที่เกี่ยวข้องกับสินค้า
-            'analyses__sentiments'  # โหลดข้อมูลความรู้สึกจากการวิเคราะห์ของสินค้านั้นๆ
+            'product_reviews',  # โหลดรีวิวของสินค้า (จาก related_name ในโมเดล Review)
+            'analyses',  # โหลดข้อมูลการวิเคราะห์ที่เกี่ยวข้องกับสินค้า (จาก related_name ในโมเดล ReviewAnalysis)
+            'analyses__sentiments'  # โหลดข้อมูลความรู้สึกจากการวิเคราะห์ของสินค้านั้นๆ (จาก related_name ในโมเดล ReviewSentiment)
         )
 
         # รับค่าค้นหาจาก Query Parameters
@@ -279,13 +277,17 @@ class ProductAnalysisListView(LoginRequiredMixin, ListView):
             positive_words = {}
             negative_words = {}
 
-            # วนลูปแต่ละการวิเคราะห์ของสินค้า
+            # วนลูปแต่ละการวิเคราะห์รีวิวของสินค้า
             for analysis_item in reviews:
                 for sentiment in analysis_item.sentiments.all(): # วนลูปความรู้สึกที่เกี่ยวข้องกับการวิเคราะห์นั้นๆ
                     if sentiment.sentiment_type == 'positive':
                         positive_words[sentiment.word] = positive_words.get(sentiment.word, 0) + 1
                     else:
                         negative_words[sentiment.word] = negative_words.get(sentiment.word, 0) + 1
+
+            # เรียงลำดับคำจากมากไปน้อย ใช้ .most_common()
+            positive_words = dict(Counter(positive_words).most_common())
+            negative_words = dict(Counter(negative_words).most_common())
 
             product.review_data = {
                 'total_reviews': total_reviews,

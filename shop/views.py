@@ -50,7 +50,7 @@ class SearchResultsView(ListView):
         context = super().get_context_data(**kwargs)
 
         query_params = self.request.GET.copy()  # คัดลอก query parameters
-        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page' ถ้ามีอยู่ เพื่อป้องกันค่าหน้าเก่าถูกส่งไป
+        query_params.pop('page', None)  # ลบพารามิเตอร์ 'page'
 
         context["categories"] = Product.CATEGORY_CHOICES
         context['query_params'] = query_params.urlencode()  # แปลงเป็น query string ที่ใช้ใน URL
@@ -64,14 +64,13 @@ class ProductDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # ดึงสินค้าปัจจุบัน
         product = self.get_object()
-        options = self.object.options.all()
 
-        # ดึงรูปภาพเพิ่มเติมของสินค้า
-        images = self.object.images.all()
-
-        # ดึงสีและไซส์ทั้งหมดที่ไม่ซ้ำกัน
-        colors = options.values_list("color", flat=True).distinct()
+        # ดึงข้อมูลที่เกี่ยวข้องกับสินค้า
+        options = product.options.all()
+        images = product.images.all()
+        colors = options.values_list("color", flat=True).distinct() # ดึงสีและไซส์ทั้งหมดที่ไม่ซ้ำกัน
         sizes = options.values_list("size", flat=True).distinct()
 
         # คำนวณราคาต่ำสุดและสูงสุด
@@ -79,20 +78,16 @@ class ProductDetailView(DetailView):
         min_price = price_range["min_price"] or 0  # ตั้งค่า 0 ถ้าไม่มีราคา
         max_price = price_range["max_price"] or 0
 
-        # สร้าง defaultdict เพื่อให้ค่าเริ่มต้นเป็น 0
+        # วิเคราะห์รีวิวสินค้า
+        review_data = ReviewAnalysis.objects.filter(product=product).values_list("polarity", flat=True)
         polarity_counts = defaultdict(int, {"positive": 0, "negative": 0, "neutral": 0})
 
-        # ดึงข้อมูลการวิเคราะห์รีวิว
-        review_data = ReviewAnalysis.objects.filter(product=product).values_list("polarity")
-
+        # วนลูปเพื่อนับจำนวนรีวิวแต่ละประเภทความรู้สึก
         for polarity in review_data:
-            if polarity[0]:  # ตรวจสอบว่ามีค่าหรือไม่
-                polarity_counts[polarity[0]] += 1
+            if polarity:  # ตรวจสอบว่าค่ามีอยู่หรือไม่
+                polarity_counts[polarity] += 1
 
-        # กำหนดค่า default ถ้าไม่มี polarity
         total_reviews = sum(polarity_counts.values())
-
-        # ถ้าไม่มีรีวิว ให้ทุกค่าเป็น 0%
         if total_reviews == 0:
             polarity_percentages = {"positive": 0, "negative": 0, "neutral": 0}
         else:
@@ -101,15 +96,20 @@ class ProductDetailView(DetailView):
                 for key, count in polarity_counts.items()
             }
 
+        # ดึงคะแนนเฉลี่ยของสินค้า
         average_rating = Review.get_average_rating(product)
 
-        sold_count = product.order_items.aggregate(total_sold=Sum('quantity'))["total_sold"] or 0
+        # นับจำนวนสินค้าที่ขายไปแล้ว
+        sold_count = product.order_items.filter(order__status='completed').aggregate(
+            total_sold=Sum('quantity')
+        )["total_sold"] or 0
 
         context.update({
             "images": images,
             "colors": colors,
             "sizes": sizes,
-            "price": f"{min_price}" if min_price == max_price else f"{min_price} - {max_price}",                "total_reviews": total_reviews,
+            "price": f"{min_price}" if min_price == max_price else f"{min_price} - {max_price}",
+            "total_reviews": total_reviews,
             "polarity_percentages": polarity_percentages,
             "average_rating": average_rating,
             "sold_count": sold_count,

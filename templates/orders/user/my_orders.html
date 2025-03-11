@@ -12,10 +12,10 @@
 
 {% include 'components/user/sidebar.html' %}
 
-<div class="min-h-screen ml-64 pb-10">
+<div class="min-h-screen mx-8 lg:ml-64 pb-10">
     <div class="container mx-auto max-w-4xl">
         <!-- Tabs -->
-        <div class="sticky top-[76px] z-20 ">
+        <div class="sticky top-[76px] z-10">
             <div class="tabs tabs-boxed mb-4 shadow-xl bg-white">
                 {% for key, label in tabs.items %}
                     <a href="?tab={{ key }}" class="tab {% if current_tab == key %}bg-red-500 text-white font-semibold{% endif %}">
@@ -101,7 +101,9 @@
                                 <div class="mt-4 space-y-3">
                                     {% for item in order.items.all %}
                                         <div class="flex items-center space-x-4 border-b pb-2">
-                                            <img src="{{ item.product.cover_image.url }}" alt="{{ item.product.name }}" class="w-20 h-20 rounded-md object-cover">
+                                            <a href="{% url 'product_detail' pk=item.product.id %}">
+                                                <img src="{{ item.product.cover_image.url }}" alt="{{ item.product.name }}" class="w-20 h-20 rounded-md object-cover">
+                                            </a>
                                             <div class="flex-1">
                                                 <p class="font-medium">{{ item.product.name }}</p>
                                                 <p class="text-sm text-gray-500">{{ item.color }}, {{ item.size }} </p>
@@ -150,11 +152,13 @@
                         <div class="bg-white shadow-xl rounded-xl p-8 border">
                             <div class="flex space-x-4 items-center">
                                 <!-- รูปสินค้า -->
-                                <figure class="w-12 h-12">
-                                    <img src="{{ review.product.cover_image.url }}"
-                                         alt="รูปภาพของ {{ review.product.name }}"
-                                         class="w-full h-full rounded-md object-cover border border-gray-300">
-                                </figure>
+                                <a href="{% url 'product_detail' pk=review.product.id %}">
+                                    <figure class="w-12 h-12">
+                                        <img src="{{ review.product.cover_image.url }}"
+                                             alt="รูปภาพของ {{ review.product.name }}"
+                                             class="w-full h-full rounded-md object-cover border border-gray-300">
+                                    </figure>
+                                </a>
 
                                 <!-- ชื่อสินค้า + ตัวเลือก -->
                                 <div class="flex-1">
@@ -222,9 +226,9 @@
 <script>
     function confirmDelete(deleteUrl, redirectUrl) {
         Swal.fire({
-            title: 'ยืนยันการลบคำสั่งซื้อ',
-            text: 'คุณแน่ใจหรือไม่ว่าต้องการลบคำสั่งซื้อนี้?',
-            confirmButtonText: 'ยืนยันการลบ',
+            title: 'ยืนยันการยกเลิกคำสั่งซื้อ',
+            text: 'คุณแน่ใจหรือไม่ว่าต้องการยกเลิกคำสั่งซื้อนี้?',
+            confirmButtonText: 'ยกเลิกคำสั่งซื้อ',
             cancelButtonText: 'ยกเลิก',
             showCancelButton: true,
             customClass: {

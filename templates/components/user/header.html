@@ -1,8 +1,21 @@
 {% load cart_extras %}
 
-<header class="fixed top-0 left-0 z-30 w-full bg-white border-b border-gray-200 px-6 py-1 shadow-sm">
+<header class="fixed top-0 left-0 z-40 w-screen bg-white border-b border-gray-200 px-6 py-1 shadow-lg h-[72px] flex items-center justify-center">
         <div class="container mx-auto px-4 flex justify-between items-center">
             <div class="flex flex-row">
+                {% url 'my_orders' as my_orders %}
+                {% url 'profile' as profile %}
+                {% url 'profile_edit' as edit %}
+
+                {% if request.path == my_orders or request.path == profile or request.path == edit %}
+                    <!-- ปุ่มเปิด Sidebar บนหน้าจอเล็ก -->
+                    <button class="block lg:hidden p-1 my-6 ml-2 bg-red-600 text-white rounded-lg hover:bg-red-700" id="toggleSidebarBtn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                            <path fill-rule="evenodd" d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75ZM3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12Zm0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
+                {% endif %}
+
                 <!-- Logo -->
                 <div class="flex items-center space-x-2">
                     <a href="{% url 'shop' %}" class="flex items-center group">
@@ -79,7 +92,7 @@
                                 </li>
                                 <li>
                                     <a href="{% url 'my_orders' %}" class="flex items-center p-2 px-3 rounded-md">
-                                        สถานะการสั่งซื้อ
+                                        การซื้อของฉัน
                                     </a>
                                 </li>
                                 <li>
@@ -94,8 +107,6 @@
                                 </li>
                             </ul>
                         </div>
-
-                     </div>
                 {% else %}
                     <!-- ยังไม่ login -->
                     <div class="flex items-center">
@@ -104,7 +115,6 @@
                     </div>
                 {% endif %}
             </div>
-
         </div>
     </header>
 
