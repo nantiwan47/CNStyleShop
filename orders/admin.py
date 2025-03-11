@@ -1,9 +1,6 @@
 from django.contrib import admin
-from orders.models import ShippingMethod, Order, OrderItem
+from orders.models import Order, OrderItem
 from django.utils.html import format_html
-
-class ShippingMethodAdmin(admin.ModelAdmin):
-    list_display = ('method_name', 'cost')
 
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ('id', 'order_code', 'product', 'quantity', 'color', 'size', 'unit_price', 'total_price')
@@ -36,6 +33,5 @@ class OrderAdmin(admin.ModelAdmin):
         )
     colored_status.short_description = 'สถานะ'
 
-admin.site.register(ShippingMethod, ShippingMethodAdmin)
 admin.site.register(Order, OrderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)

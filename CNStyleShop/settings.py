@@ -110,7 +110,7 @@ DATABASES = {
         },
     },
 }
-DATABASES['default'] = DATABASES['mysql']
+DATABASES['default'] = DATABASES['sqlite3']
 
 # # สำหรับ sqlite
 # DATABASES = {

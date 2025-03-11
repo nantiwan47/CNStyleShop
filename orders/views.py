@@ -1,12 +1,9 @@
-from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
-from django.utils import timezone
-from django.views.generic import ListView, DetailView, FormView, TemplateView
+from django.views.generic import ListView, DetailView, FormView
 from django.views import View
-from markdown_it.common.html_re import comment
 
 from cart.models import Cart
 from dashboard.models import Review
@@ -15,7 +12,7 @@ from .forms import OrderFilterForm
 from .models import Order, OrderItem
 from .forms import OrderForm
 
-from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
+from django.http import HttpResponseRedirect, HttpResponse
 
 # แอดมิน
 class OrderListView(LoginRequiredMixin, ListView):

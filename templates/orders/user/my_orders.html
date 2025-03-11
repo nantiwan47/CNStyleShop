@@ -113,7 +113,7 @@
                                             <div class="text-right">
                                                 <p class="font-medium text-red-500">รวม: ฿{{ item.total_price }}</p>
                                                 {% if order.status == 'completed' %}
-                                                    {% if item.order_item_reviews.exists %}
+                                                    {% if item.order_item_reviews %}
                                                         <p class="text-sm text-green-500 font-medium mt-3">เขียนรีวิวแล้ว</p>
                                                     {% else %}
                                                         <button
