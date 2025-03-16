@@ -1,13 +1,13 @@
 {% extends 'base_admin.html' %}
 
 {% block content %}
-<div class="px-8 min-h-screen pb-6">
+<div class="lg:px-8 min-h-screen pb-6">
     <!-- ช่องค้นหาและ fillter -->
-    <div class="flex flex-col sm:flex-row sm:justify-start items-center gap-6 mb-6">
+    <div class="gap-6 mb-6">
         <form method="GET" class="w-full max-w-6xl">
-            <div class="flex flex-col sm:flex-row gap-4 w-full items-end">
+            <div class="flex flex-wrap gap-4 w-full items-end">
                 <!-- Dropdown สถานะ -->
-                <div class="flex-grow sm:flex-grow-0">
+                <div class="flex-grow">
                     <label for="status" class="sr-only">สถานะ</label>
                     {{ form.status }}
                 </div>
@@ -50,13 +50,13 @@
         <table class="min-w-full bg-white text-left">
             <thead>
                 <tr class="bg-gray-300 text-gray-700">
-                    <th class="px-4 py-3">วันที่สั่งซื้อ</th>
+                    <th class="px-4 py-3 min-w-[190px]">วันที่สั่งซื้อ</th>
                     <th class="px-4 py-3">หมายเลขคำสั่งซื้อ</th>
-                    <th class="px-4 py-3">ชื่อผู้สั่งซื้อ</th>
-                    <th class="px-4 py-3">เบอร์โทร</th>
-                    <th class="px-4 py-3">ราคารวมทั้งหมด</th>
-                    <th class="px-4 py-3 text-center">สถานะคำสั่งซื้อ</th>
-                    <th class="px-4 py-3 text-center"></th>
+                    <th class="px-4 py-3 min-w-[150px]">ชื่อผู้สั่งซื้อ</th>
+                    <th class="px-4 py-3 ">เบอร์โทร</th>
+                    <th class="px-4 py-3 min-w-[150px]">ราคารวมทั้งหมด</th>
+                    <th class="px-4 py-3 text-center min-w-[180px]">สถานะคำสั่งซื้อ</th>
+                    <th class="px-4 py-3 text-center min-w-[150px]"></th>
                 </tr>
             </thead>
 

@@ -1,7 +1,7 @@
 {% extends "base_admin.html" %}
 
 {% block content %}
-<div class="px-8 min-h-screen pb-6">
+<div class="lg:px-8 min-h-screen pb-6">
     <div class="flex flex-col sm:flex-row sm:justify-between items-center gap-4 mb-6">
         <!-- ช่องค้นหาชื่อบทความ -->
         <form method="GET" class="flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-xl">
@@ -61,11 +61,11 @@
         <table class="min-w-full bg-white text-left">
             <thead>
                 <tr class="bg-gray-300 text-gray-700">
-                    <th class="px-6 py-3">รหัสบทความ</th>
-                    <th class="px-6 py-3 w-80">หัวข้อบทความ</th>
-                    <th class="px-6 py-3">ประเภทบทความ</th>
-                    <th class="px-6 py-3">ผู้เขียน</th>
-                    <th class="px-6 py-3">วันที่สร้าง</th>
+                    <th class="px-6 py-3 min-w-[150px]">รหัสบทความ</th>
+                    <th class="px-6 py-3 min-w-[150px]">หัวข้อบทความ</th>
+                    <th class="px-6 py-3 min-w-[200px]">ประเภทบทความ</th>
+                    <th class="px-6 py-3 min-w-[100px]">ผู้เขียน</th>
+                    <th class="px-6 py-3 min-w-[150px]">วันที่สร้าง</th>
                     <th class="px-6 py-3 text-center">จัดการ</th>
                 </tr>
             </thead>

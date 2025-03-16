@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<div class="px-8 min-h-screen pb-6">
+<div class="lg:px-8 min-h-screen pb-6">
     <div class="flex flex-col sm:flex-row sm:justify-between items-center gap-4 mb-6">
         <!-- ช่องค้นหาสินค้า -->
         <form method="GET" action="{% url 'product_list' %}" class="flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-xl">
@@ -50,7 +50,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-            <span class="hidden md:inline">เพิ่มสินค้า</span>
+            <span class="hidden lg:inline">เพิ่มสินค้า</span>
         </a>
     </div>
 
@@ -62,10 +62,10 @@
         <table class="min-w-full bg-white text-left">
             <thead>
                 <tr class="bg-gray-300 text-gray-700">
-                    <th class="px-6 py-3">รหัสสินค้า</th> 
-                    <th class="px-6 py-3 w-80">ชื่อสินค้า</th>
-                    <th class="px-6 py-3">ประเภทสินค้า</th>
-                    <th class="px-6 py-3">ราคา<span class="text-gray-700 font-medium ml-2">(ต่ำสุด - สูงสุด)</span></th>
+                    <th class="px-6 py-3 min-w-[150px]">รหัสสินค้า</th>
+                    <th class="px-6 py-3 min-w-[150px]">ชื่อสินค้า</th>
+                    <th class="px-6 py-3 min-w-[150px]">ประเภทสินค้า</th>
+                    <th class="px-6 py-3 min-w-[100px]">ราคา<span class="text-gray-700 font-medium ml-2">(ต่ำสุด - สูงสุด)</span></th>
                     <th class="px-6 py-3 text-center">จัดการ</th>
                 </tr>
             </thead>
@@ -84,7 +84,7 @@
                             <td class="px-6 py-3">{{ product.min_price }} - {{ product.max_price }}</td>
                         {% endif %}
                     
-                        <td class="px-6 py-3 text-center flex justify-between">
+                        <td class="px-6 py-3 flex justify-between items-center">
                             <a href="{% url 'product_edit' product.id %}" 
                                class="bg-gray-100 text-blue-500 py-1 px-3 rounded-md shadow hover:bg-gray-200 transition flex items-center gap-2">
                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">

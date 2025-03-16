@@ -12,11 +12,11 @@
 
 {% include 'components/user/sidebar.html' %}
 
-<div class="min-h-screen mx-8 lg:ml-64 pb-10">
+<div class="min-h-screen px-4 md:px-8 lg:ml-72 pb-10 ">
     <div class="container mx-auto max-w-4xl">
         <!-- Tabs -->
-        <div class="sticky top-[76px] z-10">
-            <div class="tabs tabs-boxed mb-4 shadow-xl bg-white">
+        <div class="sticky top-[72px] z-10">
+            <div class="tabs tabs-boxed mb-4 shadow-xl bg-white border">
                 {% for key, label in tabs.items %}
                     <a href="?tab={{ key }}" class="tab {% if current_tab == key %}bg-red-500 text-white font-semibold{% endif %}">
                         {{ label }}
@@ -27,7 +27,7 @@
 
 
         <!-- แสดงรายการคำสั่งซื้อและรีวิว -->
-        <div class="mt-6 space-y-4">
+        <div class="mt-6 space-y-4 min-h-[300px]">
             {% if items %}
                 {% if item_type == "order" %}
                     {% for order in items %}
@@ -134,13 +134,14 @@
                                 <!-- สรุปราคา ปุ่ม -->
                                 <div class="mt-6 flex items-center justify-end pt-2">
                                     <p class="font-semibold text-lg">ยอดรวมทั้งหมด: <span class="text-red-500 text-xl">฿{{ order.total_price }}</span></p>
+
                                     {% if order.status == 'pending' %}
                                         <!-- ปุ่มยกเลิกคำสั่งซื้อ -->
                                         <button onclick="confirmDelete('{% url 'cancel_order' order.id %}', '{% url 'my_orders' %}?tab=cancelled')"
-                                                class="ml-6 px-5 py-1 border border-gray-400 text-gray-600 font-normal rounded-md bg-transparent hover:bg-gray-200">
+                                                class="ml-6 px-4 py-1 border border-gray-400 text-gray-600 font-normal rounded-md bg-transparent hover:bg-gray-200">
                                             ยกเลิกคำสั่งซื้อ
                                         </button>
-                                        <a href="{% url 'payment' order.id %}" class="ml-6 px-5 py-1 bg-red-500 text-white font-semibold rounded-md shadow hover:bg-red-600">ชำระเงิน</a>
+                                        <a href="{% url 'payment' order.id %}" class="ml-6 px-4 py-1 bg-red-500 text-white font-semibold rounded-md shadow hover:bg-red-600">ชำระเงิน</a>
                                     {% endif %}
                                 </div>
                             </div>
@@ -186,7 +187,7 @@
                                 </p>
 
                                 <!-- วันที่รีวิว -->
-                                <p class="text-sm text-gray-400 mt-3">รีวิวเมื่อ: {{ review.created_at }}</p>
+                                <p class="text-sm text-gray-400 mt-3">รีวิวเมื่อ: {{ review.created_at }} น.</p>
                             </div>
 
                             </div>

@@ -6,9 +6,9 @@
 
 <div class="min-h-screen pb-10">
 
-    <img src="{% static 'images/shop/shop.png' %}" alt="shop_image" class="w-screen h-80">
+    <img src="{% static 'images/shop/shop.png' %}" alt="shop_image" class="w-screen h-40 sm:h-60 md:h-80">
 
-    <div class="max-w-5xl mx-auto mt-10">
+    <div class="max-w-5xl px-4 md:px-8 lg:mx-auto mt-10">
 
         <div class="w-full bg-gray-700 rounded-lg shadow p-3 mb-6">
             <h2 class="text-xl font-bold text-white mx-6">ประเภทสินค้า</h2>
@@ -98,13 +98,12 @@
         </div>
     </div>
 
-    <div class="max-w-5xl mx-auto mt-10 ">
-
+    <div class="max-w-5xl px-4 md:px-8 lg:mx-auto mt-10">
         <div class="w-full bg-gray-700 rounded-lg shadow p-3 mb-6">
             <h2 class="text-xl font-bold text-white mx-6">สินค้ามาใหม่</h2>
         </div>
 
-        <div class="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div class="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
             {% for product in products %}
             <div class="relative bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
                 <a href="{% url 'product_detail' product.pk %}" class="block">

@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="px-8 min-h-screen pb-6">
+<div class="md:px-8 min-h-screen pb-6">
     <div class="flex flex-col sm:flex-row sm:justify-between items-center gap-4 mb-6">
         <!-- ช่องค้นหารหัสและชื่อสินค้าและคำเชิงบวก/ลบ-->
         <form method="GET" action="{% url 'product_analysis' %}" class="flex flex-wrap sm:flex-nowrap gap-2 w-full max-w-xl">
@@ -48,14 +48,14 @@
         <table class="min-w-full bg-white text-left">
             <thead>
                 <tr class="bg-gray-300 text-gray-700 text-sm">
-                    <th class="px-2 py-3">รหัสสินค้า</th>
-                    <th class="px-4 py-3">สินค้า</th>
-                    <th class="px-2 py-3">จำนวนรีวิวทั้งหมด</th>
-                    <th class="px-2 py-3">เชิงบวก <span class="text-xs">(%)</span></th>
-                    <th class="px-2 py-3">เป็นกลาง <span class="text-xs">(%)</span></th>
-                    <th class="px-2 py-3">เชิงลบ <span class="text-xs">(%)</span></th>
-                    <th class="px-2 py-3 text-center">คำเชิงบวก</th>
-                    <th class="px-2 py-3 text-center">คำเชิงลบ</th>
+                    <th class="px-2 py-3 min-w-[100px]">รหัสสินค้า</th>
+                    <th class="px-4 py-3 min-w-[150px]">สินค้า</th>
+                    <th class="px-2 py-3 min-w-[100px]">จำนวนรีวิวทั้งหมด</th>
+                    <th class="px-2 py-3 min-w-[100px]">เชิงบวก <span class="text-xs">(%)</span></th>
+                    <th class="px-2 py-3 min-w-[100px]">เป็นกลาง <span class="text-xs">(%)</span></th>
+                    <th class="px-2 py-3 min-w-[100px]">เชิงลบ <span class="text-xs">(%)</span></th>
+                    <th class="px-2 py-3 text-center min-w-[100px]">คำเชิงบวก</th>
+                    <th class="px-2 py-3 text-center min-w-[100px]">คำเชิงลบ</th>
                 </tr>
             </thead>
 

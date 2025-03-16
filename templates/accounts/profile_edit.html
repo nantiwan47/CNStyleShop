@@ -4,14 +4,22 @@
 
 {% include 'components/user/sidebar.html' %}
 
-<div class="min-h-screen mx-8 lg:ml-64 pb-10 ">
-    <div class="max-w-4xl mx-auto bg-white p-12 rounded-xl shadow-md">
+<div class="min-h-full px-4 md:px-8 lg:ml-72 pb-10 ">
+    <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 rounded-xl shadow-md">
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
+            <div class="mt-4">
+                <!-- แสดง messages usernaem-->
+                {% include "components/alert/alert_message.html" with messages=form.username.errors %}
+            </div>
+            <div class="mt-4">
+                <!-- แสดง messages email-->
+                {% include "components/alert/alert_message.html" with messages=form.email.errors %}
+            </div>
 
             <div class="flex flex-col md:flex-row">
                 <!-- รูปโปรไฟล์ (ฝั่งขวา) -->
-                <div class="w-full md:w-1/3 flex flex-col items-center md:items-center mt-6 md:mt-0  mr-14">
+                <div class="w-full md:w-1/3 flex flex-col items-center md:items-center mt-6 md:mt-0 mr-14 mb-6">
                     <img id="preview" src="{{ user.profile_picture.url }}" alt="profile_picture" class="w-36 h-36 rounded-full border-2 border-gray-300 object-cover shadow-lg transition-all duration-300 hover:scale-105">
                     <div class="mt-4 text-sm text-gray-700 bg-gray-100 px-5 py-3 rounded-lg">
                         เลือกรูป

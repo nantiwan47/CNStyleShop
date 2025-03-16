@@ -67,26 +67,26 @@
 {% include 'components/alert/logout_dialog_user.html' %}
 
 <!-- Backdrop/Overlay สำหรับหน้าจอเล็ก -->
-<div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-20"></div>
+<div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 hidden z-20"></div>
 
 <script src="{% static 'js/accounts/logoutDialog.js' %}"></script>
 
 <script>
-  const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('overlay');
+      const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
 
-  // เปิด Sidebar และ Overlay
-  toggleSidebarBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('hidden');
-    overlay.classList.toggle('hidden');
-  });
+      // เปิด Sidebar และ Overlay
+      toggleSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+        overlay.classList.toggle('hidden');
+      });
 
-  // คลิก Overlay เพื่อปิด Sidebar
-  overlay.addEventListener('click', () => {
-    sidebar.classList.add('hidden');
-    overlay.classList.add('hidden');
-  });
+      // คลิก Overlay เพื่อปิด Sidebar
+      overlay.addEventListener('click', () => {
+        sidebar.classList.add('hidden');
+        overlay.classList.add('hidden');
+      });
 </script>
 
 

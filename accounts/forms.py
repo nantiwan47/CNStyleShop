@@ -1,6 +1,9 @@
 from .models import UserProfile
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
+from django.contrib import messages
+
 
 # แบบฟอร์มสำหรับการลงทะเบียนผู้ใช้ใหม่
 class UserRegisterForm(UserCreationForm):
@@ -126,3 +129,19 @@ class UserProfileForm(forms.ModelForm):
         model = UserProfile
         fields = ['profile_picture', 'username', 'email', 'phone_number', 'birthday', 'gender', 'address']
 
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+
+        # ตรวจสอบว่า username ซ้ำหรือไม่ (ไม่รวมผู้ใช้ที่กำลังแก้ไข)
+        if UserProfile.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("ชื่อผู้ใช้นี้มีอยู่ในระบบแล้ว กรุณาเลือกชื่ออื่น")
+        return username
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+
+        # ตรวจสอบว่าอีเมลซ้ำหรือไม่ (ไม่รวมผู้ใช้ที่กำลังแก้ไข)
+        if UserProfile.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise ValidationError("อีเมลนี้มีอยู่ในระบบแล้ว กรุณากรอกอีเมลอื่น")
+
+        return email

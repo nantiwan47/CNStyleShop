@@ -1,5 +1,5 @@
 {% load static %}
-<aside class="fixed top-0 left-0 z-20 w-64 h-screen pt-20 bg-white border-r border-gray-200 " aria-label="Sidebar">
+<aside class="fixed top-0 left-0 z-30 w-64 h-screen pt-20 bg-white border-r border-gray-200 lg:block hidden" aria-label="Sidebar" id="sidebar">
    <div class="h-full pt-2 px-4 overflow-y-auto">
       <ul class="space-y-2 font-medium">
           <!-- Dashboard -->
@@ -116,7 +116,27 @@
    </div>
 </aside>
 
+<!-- Backdrop/Overlay สำหรับหน้าจอเล็ก -->
+<div id="overlay" class="fixed inset-0 bg-black bg-opacity-40 hidden z-20"></div>
+
 {% include 'components/alert/logout_dialog_admin.html' %}
 
 <script src="{% static 'js/accounts/logoutDialog.js' %}"></script>
 
+<script>
+      const toggleSidebarBtn = document.getElementById('toggleSidebarBtn');
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('overlay');
+
+      // เปิด Sidebar และ Overlay
+      toggleSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('hidden');
+        overlay.classList.toggle('hidden');
+      });
+
+      // คลิก Overlay เพื่อปิด Sidebar
+      overlay.addEventListener('click', () => {
+        sidebar.classList.add('hidden');
+        overlay.classList.add('hidden');
+      });
+</script>

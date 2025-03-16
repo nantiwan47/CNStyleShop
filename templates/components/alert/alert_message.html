@@ -4,6 +4,7 @@
             {% if message.tags == 'success' %} text-green-800 bg-green-100
             {% elif message.tags == 'error' %} text-red-800 bg-red-100
             {% elif message.tags == 'info' %} text-blue-800 bg-blue-100
+            {% else %} text-red-800 bg-red-100
             {% endif %}" role="alert">
 
             <!-- ไอคอน -->
@@ -22,6 +23,7 @@
                 {% if message.tags == 'success' %} bg-green-50 text-green-500 focus:ring-green-400 hover:bg-green-200
                 {% elif message.tags == 'error' %} bg-red-50 text-red-500 focus:ring-red-400 hover:bg-red-200
                 {% elif message.tags == 'info' %} bg-blue-50 text-blue-500 focus:ring-blue-400 hover:bg-blue-300
+                {% else %} bg-red-50 text-red-500 focus:ring-red-400 hover:bg-red-200
                 {% endif %}"
                 onclick="this.parentElement.style.display='none';"
                 aria-label="Close">
@@ -35,11 +37,11 @@
 {% endif %}
 
 <script>
-    // ตั้งเวลาปิดข้อความอัตโนมัติใน 5 วินาที
+    // ตั้งเวลาปิดข้อความอัตโนมัติใน 6 วินาที
     setTimeout(function() {
         let alerts = document.querySelectorAll('[id^="alert-"]');
         alerts.forEach(alert => {
             alert.style.display = 'none';
         });
-    }, 5000);
+    }, 6000);
 </script>

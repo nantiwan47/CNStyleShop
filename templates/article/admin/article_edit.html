@@ -6,17 +6,17 @@
 {% endblock %}
 
 {% block content %}
-<form method="POST" enctype="multipart/form-data" class="px-24 space-y-4 pb-6">
+<form method="POST" enctype="multipart/form-data" class="lg:px-24 space-y-4 pb-6">
     {% csrf_token %}
 
     <!-- ข้อมูลรูปภาพ -->
     <div class="bg-white p-10 rounded-xl shadow-sm">
         <h1 class="text-xl font-semibold mb-6 text-gray-700">รูปภาพปกของบทความ</h1>
-        <div class="space-y-6 px-24">
-            <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6 mb-14">
+        <div class="space-y-6 px-8 sm:px-14 md:px-16 lg:px-24">
+            <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-6">
 
                 <!-- แสดงรูปภาพ -->
-                <div class="w-full md:w-3/4 h-auto sm:h-40 md:h-60 border-2 border-dashed border-gray-400 flex items-center justify-center rounded-lg bg-gray-100 overflow-hidden relative">
+                <div class="w-full md:w-3/4 h-auto sm:h-40  md:h-60 border-2 border-dashed border-gray-400 flex items-center justify-center rounded-lg bg-gray-100 overflow-hidden relative">
                     {% if form.image.value %}
                         <img id="image_preview" src="{{ form.image.value.url }}" alt="Current Image" class="w-full h-full object-cover">
                         <!-- ข้อความเริ่มต้นสำหรับไม่มีรูป -->
@@ -45,7 +45,7 @@
     <!-- ข้อมูลทั่วไป -->
     <div class="bg-white p-10 rounded-xl shadow-sm">
         <h1 class="text-xl font-semibold mb-6 text-gray-700">ข้อมูลทั่วไป</h1>
-        <div class="space-y-6 px-24">
+        <div class="space-y-6 px-8 sm:px-14 md:px-16 lg:px-24">
             <div>
                 <label for="title" class="block text-gray-600 font-medium mb-2">หัวข้อบทความ:</label>
                 {{ form.title }}
