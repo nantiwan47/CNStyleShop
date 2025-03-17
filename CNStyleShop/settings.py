@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -61,6 +60,9 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
+
+    # เพิ่ม Middleware ป้องกันผู้ใช้ทั่วไปเข้าหน้า admin
+    "accounts.middleware.AdminOnlyMiddleware",
 ]
 
 ROOT_URLCONF = "CNStyleShop.urls"
@@ -85,9 +87,7 @@ TEMPLATES = [
 WSGI_APPLICATION = "CNStyleShop.wsgi.application"
 
 TAILWIND_APP_NAME = 'theme'
-
 NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
-
 
 
 # Database
@@ -110,7 +110,7 @@ DATABASES = {
         },
     },
 }
-DATABASES['default'] = DATABASES['sqlite3']
+DATABASES['default'] = DATABASES['mysql']
 
 AUTH_USER_MODEL = 'accounts.UserProfile'
 
