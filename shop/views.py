@@ -15,6 +15,7 @@ class ShopListView(ListView):
     template_name = 'shop/shop.html'
     context_object_name = 'products'
 
+    # ใช้ options (related_name) เพื่อเข้าถึงฟิลด์ price ในโมเดล ProductOption
     def get_queryset(self):
         return Product.objects.annotate(min_price=Min('options__price')).order_by('-created_at')[:20]
 
@@ -67,16 +68,8 @@ class ProductDetailView(DetailView):
         # ดึงสินค้าปัจจุบัน
         product = self.get_object()
 
-        # ดึงข้อมูลที่เกี่ยวข้องกับสินค้า
-        options = product.options.all()
+        # ดึงรูปภาพที่เกี่ยวข้องกับสินค้า
         images = product.images.all()
-        colors = options.values_list("color", flat=True).distinct() # ดึงสีและไซส์ทั้งหมดที่ไม่ซ้ำกัน
-        sizes = options.values_list("size", flat=True).distinct()
-
-        # คำนวณราคาต่ำสุดและสูงสุด
-        price_range = options.aggregate(min_price=Min("price"), max_price=Max("price"))
-        min_price = price_range["min_price"] or 0  # ตั้งค่า 0 ถ้าไม่มีราคา
-        max_price = price_range["max_price"] or 0
 
         # วิเคราะห์รีวิวสินค้า
         review_data = ReviewAnalysis.objects.filter(product=product).values_list("polarity", flat=True)
@@ -87,6 +80,7 @@ class ProductDetailView(DetailView):
             if polarity:  # ตรวจสอบว่าค่ามีอยู่หรือไม่
                 polarity_counts[polarity] += 1
 
+        # คำนวณ polarity_percentages
         total_reviews = sum(polarity_counts.values())
         if total_reviews == 0:
             polarity_percentages = {"positive": 0, "negative": 0, "neutral": 0}
@@ -106,9 +100,6 @@ class ProductDetailView(DetailView):
 
         context.update({
             "images": images,
-            "colors": colors,
-            "sizes": sizes,
-            "price": f"{min_price}" if min_price == max_price else f"{min_price} - {max_price}",
             "total_reviews": total_reviews,
             "polarity_percentages": polarity_percentages,
             "average_rating": average_rating,

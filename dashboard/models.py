@@ -17,6 +17,7 @@ class Review(models.Model):
     analysis_done = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # เรียกใช้ class method โดยไม่ต้องสร้างออบเจ็กต์
     @classmethod
     def get_average_rating(cls, product):
         """ ดึงค่าเฉลี่ยของคะแนนรีวิวของสินค้า """

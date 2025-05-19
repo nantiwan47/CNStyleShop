@@ -33,7 +33,7 @@ def handle_rate_limit(response):
 
     # กรณีเกินลิมิตในหน่วยนาที, วัน, เดือน: แจ้งเตือนและหยุดการทำงาน (คำนวณเวลาที่เหลือจนกว่า Rate Limit จะรีเซ็ต)
     if remaining_minute <= 0:
-        reset_time = datetime.now() + timedelta(minutes=1)
+        reset_time = datetime.now() + timedelta(minutes=1) # # เพิ่ม 1 นาทีเข้าไป
     elif remaining_day <= 0:
         reset_time = datetime.now() + timedelta(days=1)
     elif remaining_month <= 0:
@@ -41,6 +41,7 @@ def handle_rate_limit(response):
     else:
         return None  # ไม่มีลิมิตเกิน
 
+    # ฟอร์แมตให้เป็น string ในรูปแบบ "วัน-เดือน-ปี ชั่วโมง:นาที:วินาที"
     return f"{reset_time.strftime('%d-%m-%Y %H:%M:%S')}"
 
 def process_review_analysis(session, review, api_url, headers):
@@ -56,6 +57,8 @@ def process_review_analysis(session, review, api_url, headers):
         sentiment = result.get('sentiment', {})
         preprocess = result.get('preprocess', {})
 
+        print(preprocess.get('segmented',[]))
+
         with transaction.atomic():
             # 1. บันทึกผลลัพธ์การวิเคราะห์ลงใน ReviewAnalysis
             review_analysis = ReviewAnalysis.objects.create(
@@ -68,6 +71,7 @@ def process_review_analysis(session, review, api_url, headers):
             pos_words = preprocess.get('pos', [])
             neg_words = preprocess.get('neg', [])
 
+            # sentiments เป็น list ที่เก็บอ็อบเจ็กต์ของ ReviewSentiment
             sentiments = [
                 ReviewSentiment(analysis=review_analysis, sentiment_type='positive', word=word)
                      for word in pos_words
@@ -163,7 +167,7 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             .order_by("-total_quantity")  # เรียงจากมากไปน้อย
         )
 
-        # #ับจำนวนรีวิวที่ยังไม่ได้วิเคราะห์
+        # #นับจำนวนรีวิวที่ยังไม่ได้วิเคราะห์
         unprocessed_review_count = Review.objects.filter(analysis_done=False).count()
 
         # หาวันที่มีการวิเคราะห์ล่าสุด
@@ -182,20 +186,20 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'negative': 0
         }
 
-        # ถ้ามีรีวิวทั้งหมด
+        # ถ้ามีรีวิวทั้งหมด และคำนวณเปอร์เซ็นต์ โดยปัดเศษผลลัพธ์เป็นทศนิยม 2 ตำแหน่ง
         if total_reviews_product > 0:
             for item in sentiment_counts:
                 sentiment_percentages[item['polarity']] = round((item['count'] / total_reviews_product) * 100, 2)
 
         # 6. วิเคราะห์ความคิดเห็นตามประเภทสินค้า
         review_summary = Product.objects.values('category').annotate(
-            total_reviews=Count('analyses'),
+            total_reviews=Count('analyses'), # นับจำนวนรีวิวที่วิคราะห์ทั้งหมด (ReviewAnalysis) ที่เกี่ยวข้องกับสินค้าในแต่ละ category
             positive_reviews=Count('analyses', filter=Q(analyses__polarity='positive')),
             negative_reviews=Count('analyses', filter=Q(analyses__polarity='negative')),
             neutral_reviews=Count('analyses', filter=Q(analyses__polarity='neutral'))
-        ).filter(total_reviews__gt=0).order_by('category')
+        ).filter(total_reviews__gt=0).order_by('category') # กรองเฉพาะประเภทสินค้าที่มีรีวิว และ เรียงลำดับผลลัพธ์ตาม category
 
-        result = []
+        result = [] # สร้าง list ว่างชื่อ result เพื่อเก็บผลลัพธ์ที่คำนวณได้
         for item in review_summary:
             total_reviews = item['total_reviews']
 
@@ -242,9 +246,8 @@ class ProductAnalysisListView(LoginRequiredMixin, ListView):
         queryset = Product.objects.filter(analyses__isnull=False).distinct()  # กรองเฉพาะสินค้าที่มีการวิเคราะห์ (มีข้อมูลในตาราง ReviewAnalysis ที่เกี่ยวข้องกับสินค้านั้นๆ)
 
         queryset = queryset.prefetch_related(
-            'product_reviews',  # โหลดรีวิวของสินค้า (จาก related_name ในโมเดล Review)
             'analyses',  # โหลดข้อมูลการวิเคราะห์ที่เกี่ยวข้องกับสินค้า (จาก related_name ในโมเดล ReviewAnalysis)
-            'analyses__sentiments'  # โหลดข้อมูลความรู้สึกจากการวิเคราะห์ของสินค้านั้นๆ (จาก related_name ในโมเดล ReviewSentiment)
+            'analyses__sentiments'  # โหลดข้อมูลคำเชิงบวกเชิงลบจากการวิเคราะห์ของสินค้านั้นๆ (จาก related_name ในโมเดล ReviewSentiment)
         )
 
         # รับค่าค้นหาจาก Query Parameters
@@ -277,15 +280,15 @@ class ProductAnalysisListView(LoginRequiredMixin, ListView):
             positive_words = {}
             negative_words = {}
 
-            # วนลูปแต่ละการวิเคราะห์รีวิวของสินค้า
+            # วนลูปแต่ละการวิเคราะห์รีวิวของสินค้า ReviewAnalysis
             for analysis_item in reviews:
-                for sentiment in analysis_item.sentiments.all(): # วนลูปความรู้สึกที่เกี่ยวข้องกับการวิเคราะห์นั้นๆ
+                for sentiment in analysis_item.sentiments.all(): # วนลูปคำเชิงบวกเชิงลบที่เกี่ยวข้องกับการวิเคราะห์นั้นๆ
                     if sentiment.sentiment_type == 'positive':
-                        positive_words[sentiment.word] = positive_words.get(sentiment.word, 0) + 1
+                        positive_words[sentiment.word] = positive_words.get(sentiment.word, 0) + 1 # ใช้ dict.get() ตรวจสอบว่าคำนี้มีอยู่ใน dictionary หรือยัง
                     else:
                         negative_words[sentiment.word] = negative_words.get(sentiment.word, 0) + 1
 
-            # เรียงลำดับคำจากมากไปน้อย ใช้ .most_common()
+            # เรียงลำดับความถี่คำจากมากไปน้อย ใช้ .most_common()
             positive_words = dict(Counter(positive_words).most_common())
             negative_words = dict(Counter(negative_words).most_common())
 

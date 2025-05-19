@@ -72,8 +72,8 @@ class UpdateCartView(LoginRequiredMixin, View):
 
         item.save()
 
-        # คำนวณราคารวมของสินค้าและตะกร้าทั้งหมด
-        cart = item.cart
+        # คำนวณราคารวมของสินค้าและรถเข็นทั้งหมด
+        cart = item.cart # ดึงข้อมูลรถเข็นที่เกี่ยวข้องกับ CartItem นั้น ๆ
         total_price = item.item_price()
         cart_total = cart.get_total_price()
 

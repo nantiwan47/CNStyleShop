@@ -2,7 +2,7 @@
     {% for review in reviews %}
         <div class="border border-gray-300 px-6 py-4 mt-4 rounded-lg bg-white shadow">
             <div class="flex items-center space-x-3">
-                <img src="{{ review.user.profile_picture.url }}" class="w-10 h-10 rounded-full" alt="Profile">
+                <img src="{{ review.user.profile_picture.url }}" class="w-10 h-10 rounded-full object-cover" alt="Profile">
                 <div>
                     <p class="text-sm font-semibold">{{ review.user.username }}</p>
                     <p class="text-sm text-gray-500">ตัวเลือกสินค้า: {{ review.order_item.color }}, {{ review.order_item.size }}</p>

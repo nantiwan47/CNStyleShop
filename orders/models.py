@@ -22,7 +22,7 @@ class Order(models.Model):
         ('cancelled', 'ยกเลิก'),
     )
 
-    order_code = models.CharField(max_length=20, unique=True, editable=False) # ,
+    order_code = models.CharField(max_length=20, unique=True, editable=False) # ไม่แสดงในฟอร์มการสร้างหรือการแก้ไขข้อมูล
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE, related_name='orders')
     full_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=10)
@@ -58,6 +58,7 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.id} | หมายเลขคำสั่งซื้อ: {self.order.order_code} | สินค้า: {self.product.name} - จำนวน: {self.quantity} | สี: {self.color} | ขนาด: {self.size} | ราคาต่อหน่วย: {self.unit_price} บาท"
 
+    # จะถูกเรียกใช้งานได้เหมือนฟิลด์ (attribute) แทนที่จะเป็นฟังก์ชัน
     @property
     def total_price(self):
         return self.quantity * self.unit_price

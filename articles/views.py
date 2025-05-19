@@ -66,7 +66,6 @@ class ArticleCreateView(LoginRequiredMixin, CreateView):
     @transaction.atomic
     def form_valid(self, form):
         form.instance.user = self.request.user  # กำหนด user จากที่ล็อกอินอยู่
-
         messages.success(self.request, f'เพิ่มบทความ "{form.instance.title}" สำเร็จ!')
         return super().form_valid(form) # บันทึกข้อมูลและ redirect ไปยัง success_url
 
@@ -78,8 +77,7 @@ class ArticleUpdateView(LoginRequiredMixin, UpdateView):
     success_url = reverse_lazy('article_list')
 
     def form_valid(self, form):
-        article = form.save()  # บันทึกข้อมูลบทความ
-        messages.success(self.request, f"แก้ไขบทความ '{article.title}' สำเร็จ!")
+        messages.success(self.request, f"แก้ไขบทความ '{form.instance.title}' สำเร็จ!")
         return super().form_valid(form)
 
 class ArticleDeleteView(LoginRequiredMixin, DeleteView):

@@ -108,11 +108,17 @@
         const defaultSrc = preview.src;
 
         fileInput.addEventListener('change', function() {
+            // ตรวจสอบว่ามีไฟล์ถูกเลือกหรือไม่
             if (fileInput.files.length > 0) {
+                // สร้างออบเจ็กต์ FileReader เพื่ออ่านข้อมูลไฟล์
                 const reader = new FileReader();
+
+                // กำหนดฟังก์ชันที่จะทำงานเมื่อการอ่านไฟล์เสร็จสิ้น
                 reader.onload = function(e) {
+                    // นำข้อมูลที่อ่านได้ (ซึ่งอยู่ในรูปแบบ Data URL) ไปกำหนดให้กับ src ของรูปภาพ preview
                     preview.src = e.target.result;
                 };
+                // อ่านไฟล์ที่ผู้ใช้เลือกเป็น Data URL (รูปแบบ base64)
                 reader.readAsDataURL(fileInput.files[0]);
             } else {
                 // ถ้ากดยกเลิก กลับไปแสดงรูปเดิม

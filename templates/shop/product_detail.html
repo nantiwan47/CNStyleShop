@@ -41,10 +41,13 @@
                 </span>
             </div>
 
-
-            <!-- ตัวเลือกสินค้า และปุ่ม -->
-            <div id="product-options" class="mt-4">
-                {% include "shop/partials/product_options.html" with product_id=product.id all_colors=colors all_sizes=sizes available_colors=colors available_sizes=sizes selected_color='' selected_size='' price=price product_option_id=None %}
+            <!-- ราคา ตัวเลือกสินค้า และปุ่ม -->
+            <div id="product-options"
+                 hx-get="{% url 'product-options' product.id %}"
+                 hx-trigger="load"
+                 hx-target="#product-options"
+                 hx-swap="innerHTML"
+                 class="mt-4">
             </div>
 
             <!-- จำนวนสินค้า -->
@@ -175,7 +178,7 @@
 
         // กดปุ่มลดจำนวนสินค้า
         decreaseBtn.addEventListener("click", function () {
-             // แปลงค่าจาก string เป็น number (integer) โดยใช้เลขฐาน 10
+             // แปลงค่าจาก string เป็น number (integer) โดยใช้เลขฐาน 10 ใช้ parseInt พาร์ส อิน
             let currentValue = parseInt(quantityInput.value, 10);
             if (currentValue > 1) {
                 updateQuantity(currentValue - 1);

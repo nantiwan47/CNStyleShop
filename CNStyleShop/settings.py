@@ -14,7 +14,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -63,6 +62,7 @@ MIDDLEWARE = [
 
     # เพิ่ม Middleware ป้องกันผู้ใช้ทั่วไปเข้าหน้า admin
     "accounts.middleware.AdminOnlyMiddleware",
+    "accounts.middleware.RedirectCartAddMiddleware",
 ]
 
 ROOT_URLCONF = "CNStyleShop.urls"
@@ -172,8 +172,8 @@ TINYMCE_DEFAULT_CONFIG = {
 
 }
 
-# ALLOWED_HOSTS = [
-#     'eb31-49-231-194-157.ngrok-free.app',
-#     'localhost',
-#     '127.0.0.1'
-# ]
+ALLOWED_HOSTS = [
+    '7640-49-231-194-158.ngrok-free.app',
+    'localhost',
+    '127.0.0.1'
+]

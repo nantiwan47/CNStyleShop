@@ -3,7 +3,7 @@
 {% block extra_head %}
     <style>
         .rating input:checked {
-            background-color: #FACC15 !important; /* สีของดาวที่ถูกเลือก */
+            background-color: #FACC15 !important; /* บังคับให้สีของดาวที่ถูกเลือก */
         }
     </style>
 {% endblock %}
@@ -247,11 +247,13 @@
                     }
                 }).then(response => {
                     if (response.ok || response.status === 204) {
-                         window.location.href = redirectUrl;   // เปลี่ยนหน้าไปยังแท็บ cancelled
+                        window.location.href = redirectUrl;   // เปลี่ยนหน้าไปยังแท็บ cancelled
                     } else {
-                        Swal.fire('เกิดข้อผิดพลาด!', '', 'error');
+                        response.text().then(msg => { // อ่านข้อความ error ที่ส่งจาก server แล้วแสดง แบบ Swal.fire(หัวข้อ, เนื้อหา, ประเภท)
+                            Swal.fire('เกิดข้อผิดพลาด', msg || 'ไม่สามารถยกเลิกคำสั่งซื้อนี้ได้', 'error');
+                        });
                     }
-                })
+                });
             }
         });
     }

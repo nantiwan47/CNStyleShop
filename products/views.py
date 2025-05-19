@@ -18,6 +18,13 @@ from .forms import ProductForm
 def save_product_options(product, colors, sizes, prices):
     """
     บันทึกตัวเลือกสินค้า (ProductOption) ลงในฐานข้อมูล
+    ตัวอย่าง
+    colors = ["Red", "Blue"]
+    sizes = ["M", "L"]
+    prices = [500, 550]
+
+    รอบที่ 1: color="Red", size="M", price=500
+    รอบที่ 2: color="Blue", size="L", price=550
     """
     for color, size, price in zip(colors, sizes, prices):
         ProductOption.objects.create(
@@ -108,6 +115,7 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form) # ทำการ redirect ไปยัง success_url
 
 class ProductEditView(LoginRequiredMixin, UpdateView):
+
     login_url = 'admin_login'
     model = Product
     form_class = ProductForm
@@ -161,7 +169,7 @@ class ProductEditView(LoginRequiredMixin, UpdateView):
 
 class DeleteImageView(View):
 
-    def delete(self, request, image_id, *args, **kwargs):
+    def delete(self, request, image_id):
         # ดึงข้อมูลรูปภาพที่ต้องการลบ
         image = get_object_or_404(ProductImage, id=image_id)
 

@@ -12,7 +12,7 @@ from .forms import OrderFilterForm
 from .models import Order, OrderItem
 from .forms import OrderForm
 
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 
 # แอดมิน
 class OrderListView(LoginRequiredMixin, ListView):
@@ -66,6 +66,7 @@ class OrderDetailView(LoginRequiredMixin, DetailView):
     model = Order
     template_name = 'orders/admin/order_detail.html'
     context_object_name = 'order'
+
 
 
 # ผู้ใช้
@@ -158,7 +159,6 @@ class CartCheckoutView(LoginRequiredMixin, FormView):
 
         return context
 
-
     def form_valid(self, form):
         user = self.request.user
         cart = Cart.objects.get(user=user)
@@ -196,8 +196,9 @@ class CancelOrderView(LoginRequiredMixin, View):
             # เปลี่ยนสถานะของคำสั่งซื้อเป็น 'cancelled'
             order.status = 'cancelled'
             order.save()
-
-        return HttpResponse(status=204)
+            return HttpResponse(status=204)
+        else:
+            return HttpResponseBadRequest("ไม่สามารถยกเลิกคำสั่งซื้อนี้ได้") # ส่งข้อผิดพลาด 400 พร้อมข้อความ
 
 class PaymentView(LoginRequiredMixin, View):
     login_url = 'login'

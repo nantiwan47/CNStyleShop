@@ -3918,6 +3918,10 @@ details.collapse summary::-webkit-details-marker {
   height: 100vh;
 }
 
+.max-h-\[250px\] {
+  max-height: 250px;
+}
+
 .max-h-full {
   max-height: 100%;
 }
@@ -4008,10 +4012,6 @@ details.collapse summary::-webkit-details-marker {
 
 .w-52 {
   width: 13rem;
-}
-
-.w-56 {
-  width: 14rem;
 }
 
 .w-6 {
@@ -4110,8 +4110,8 @@ details.collapse summary::-webkit-details-marker {
   max-width: 200px;
 }
 
-.max-w-\[400px\] {
-  max-width: 400px;
+.max-w-\[300px\] {
+  max-width: 300px;
 }
 
 .max-w-full {
