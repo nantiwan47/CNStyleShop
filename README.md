@@ -1,6 +1,6 @@
 **1. Clone โปรเจคจาก GitHub**
-- gh repo clone nantiwan47/CNStyleShop-modelV2
-- cd CNStyleShop-modelV2
+- gh repo clone nantiwan47/CNStyleShop
+- cd CNStyleShop
 
 **2. สร้าง virtual environment สำหรับ Windows**  
 - python -m venv venv
