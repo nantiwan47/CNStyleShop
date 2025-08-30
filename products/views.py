@@ -1,5 +1,3 @@
-import os
-
 from django.db import transaction
 from django.db.models import Min, Max
 from django.shortcuts import get_object_or_404
@@ -33,14 +31,6 @@ def save_product_options(product, colors, sizes, prices):
             size=size,
             price=price
         )
-
-def delete_file(file_path):
-    # ตรวจสอบว่าไฟล์ที่ต้องการลบมีอยู่จริงในระบบไฟล์หรือไม่
-    if os.path.exists(file_path):
-        try:
-            os.remove(file_path)
-        except Exception as e:
-            print(f"Error while deleting file: {e}")
 
 class ProductListView(LoginRequiredMixin, ListView):
     login_url = 'admin_login'
@@ -173,9 +163,6 @@ class DeleteImageView(View):
         # ดึงข้อมูลรูปภาพที่ต้องการลบ
         image = get_object_or_404(ProductImage, id=image_id)
 
-        # ลบรูปภาพออกจากระบบไฟล์
-        delete_file(image.image.path)
-
         # ลบข้อมูลรูปภาพออกจากฐานข้อมูล
         image.delete()
 
@@ -189,15 +176,6 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
     def post(self, request, *args, **kwargs):
         # ดึงข้อมูลสินค้าที่ต้องการลบ
         product = self.get_object()
-
-        # ลบรูปภาพปกของสินค้า (cover_image) ออกจากระบบไฟล์ (filesystem) ของเซิร์ฟเวอร์
-        # เรียกฟังก์ชัน delete_file เพื่อลบไฟล์รูปภาพปกสินค้า
-        delete_file(product.cover_image.path)
-
-        # ลบรูปภาพที่เกี่ยวข้องจาก ProductImage ออกจากระบบไฟล์ (filesystem) ของเซิร์ฟเวอร์
-        product_images = product.images.all()
-        for image in product_images:
-            delete_file(image.image.path)
 
         # ลบสินค้าและข้อมูลที่เกี่ยวข้องออกจากฐานข้อมูล
         product.delete()

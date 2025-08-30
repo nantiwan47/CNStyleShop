@@ -21,8 +21,6 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path("__reload__/", include("django_browser_reload.urls")),
-
     path('tinymce/', include('tinymce.urls')),
 
     path('dj-admin/', admin.site.urls),
@@ -44,4 +42,10 @@ urlpatterns = [
 
 # เสริมสำหรับเสิร์ฟ Media Files ในโหมด Development
 if settings.DEBUG:
+    # สำหรับ media files
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+    # สำหรับ django-browser-reload
+    urlpatterns += [
+        path("__reload__/", include("django_browser_reload.urls")),
+    ]

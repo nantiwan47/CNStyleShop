@@ -1,5 +1,3 @@
-import os
-
 from django.db import transaction
 from django.http import JsonResponse
 from django.contrib import messages
@@ -14,15 +12,6 @@ from django.db.models import F
 
 
 # ส่วนของแอดมิน
-
-def delete_file(file_path):
-    # ตรวจสอบว่าไฟล์ที่ต้องการลบมีอยู่จริงในระบบไฟล์หรือไม่
-    if os.path.exists(file_path):
-        try:
-            os.remove(file_path)
-        except Exception as e:
-            print(f"Error while deleting file: {e}")
-
 class ArticleListView(LoginRequiredMixin, ListView):
     login_url = 'admin_login'
     model = Article
@@ -87,10 +76,6 @@ class ArticleDeleteView(LoginRequiredMixin, DeleteView):
     def post(self, request, *args, **kwargs):
         # ดึงข้อมูลบทความที่ต้องการลบ
         article = self.get_object()
-
-        # ลบรูปภาพปกของบทความ (image) ออกจากระบบไฟล์ (filesystem) ของเซิร์ฟเวอร์
-        # เรียกฟังก์ชัน delete_file เพื่อลบไฟล์รูปภาพบทความ
-        delete_file(article.image.path)
 
         # ลบบทความออกจากฐานข้อมูล
         article.delete()

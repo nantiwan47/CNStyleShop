@@ -47,7 +47,9 @@ INSTALLED_APPS = [
     "theme",
     "django_browser_reload",
 
-    "tinymce"
+    "tinymce",
+    
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 MIDDLEWARE = [
@@ -62,7 +64,6 @@ MIDDLEWARE = [
 
     # เพิ่ม Middleware ป้องกันผู้ใช้ทั่วไปเข้าหน้า admin
     "accounts.middleware.AdminOnlyMiddleware",
-    "accounts.middleware.RedirectCartAddMiddleware",
 ]
 
 ROOT_URLCONF = "CNStyleShop.urls"
@@ -89,7 +90,6 @@ WSGI_APPLICATION = "CNStyleShop.wsgi.application"
 TAILWIND_APP_NAME = 'theme'
 NPM_BIN_PATH = r"C:\Program Files\nodejs\npm.cmd"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
@@ -110,7 +110,7 @@ DATABASES = {
         },
     },
 }
-DATABASES['default'] = DATABASES['mysql']
+DATABASES['default'] = DATABASES['sqlite3']
 
 AUTH_USER_MODEL = 'accounts.UserProfile'
 
@@ -169,11 +169,4 @@ TINYMCE_DEFAULT_CONFIG = {
     'plugins': 'lists',  # เพิ่มปลั๊กอิน lists
     'branding': False,  # ซ่อนโลโก้ TinyMCE
     'content_style': 'body {  background-color: #f5f5f5; }',  # กำหนดสีพื้นหลังและกรอบ
-
 }
-
-ALLOWED_HOSTS = [
-    '7640-49-231-194-158.ngrok-free.app',
-    'localhost',
-    '127.0.0.1'
-]
