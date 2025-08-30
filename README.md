@@ -54,7 +54,7 @@
   cd CNStyleShop
   ```
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/b563d7ba-1cb2-4a0c-b032-d7fcf3613119" alt="clone" width="500"/>
+  <img src="https://github.com/user-attachments/assets/d32ba166-6585-4914-958f-976f74cc0b2b" alt="clone" width="500"/>
 </p>
 
 **2. สร้าง virtual environment และเปิดใช้งาน (สำหรับ Windows)**
@@ -64,7 +64,7 @@
   venv\Scripts\activate
   ```
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/408d3121-8647-4646-ba86-2d90d97322d2" alt="environment" width="500"/>
+  <img src="https://github.com/user-attachments/assets/52a67e0b-a8c0-4642-8f5a-75967081e7c1" alt="environment" width="500"/>
 </p>
 
 **3. ติดตั้ง Python dependencies**
@@ -73,7 +73,7 @@
   pip install -r requirements.txt
   ```
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/c0d8f157-66de-499d-b30c-7e18196f1e25" alt="install requirements" width="500"/>
+  <img src="https://github.com/user-attachments/assets/91b2e5f6-d2db-476b-ae37-72a98185f02c" alt="install requirements" width="500"/>
 </p>
 
 **4. ติดตั้ง npm dependencies สำหรับ Tailwind CSS**
@@ -93,10 +93,10 @@
   cd ../../
   ```
   <p align="center">
-    <img src="https://github.com/user-attachments/assets/94413427-2c21-4e83-80ed-4af74ae10e21" alt="npm" width="500"/>
+    <img src="https://github.com/user-attachments/assets/3fc44555-60e6-4e84-b359-78a1c1f0a400" alt="npm" width="500"/>
   </p>
-  
-  >จากนั้นเปิดโปรเจกต์ด้วยโปรแกรมแก้ไขโค้ดที่คุณสะดวก (เช่น VS Code, PyCharm ฯลฯ) หากใช้ VS Code สามารถใช้คำสั่ง: `code .`
+
+  >จากนั้นเปิดโปรเจกต์ด้วยโปรแกรมแก้ไขโค้ดที่สะดวก (เช่น VS Code, PyCharm ฯลฯ) หากใช้ VS Code สามารถใช้คำสั่ง: `code .`
 
 **5. ตั้งค่า Database**
 
@@ -121,7 +121,7 @@
 >ไปที่โปรเจกต์ Django (โฟลเดอร์ CNStyleShop) เปิดไฟล์ settings.py ไปที่ส่วน DATABASES และทำการแก้ไข USER และ PASSWORD ให้ตรงกับที่ตั้งไว้ตอนติดตั้ง MySQL
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/82ef3bf4-de7a-4638-917b-63863e68715f" alt="MySQL1" width="700"/>
+  <img src="https://github.com/user-attachments/assets/181dd8d0-41ae-45d0-9938-171f6c260111" alt="MySQL1" width="700"/>
 </p>
 
 รันคำสั่ง migrate เพื่อสร้างตารางในฐานข้อมูล
@@ -144,7 +144,7 @@
   ```
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/a761fb5f-3b14-4009-839a-7a27c1b2e610" alt="tailwind start" width="700"/>
+  <img src="https://github.com/user-attachments/assets/f806c3ed-7a3b-4be8-9877-8307ab2c46fe" alt="tailwind start" width="700"/>
 </p>
 
 **7. รัน Django**
@@ -153,8 +153,9 @@
   ```bash
   python manage.py runserver
   ```
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/079f40f1-808f-4a90-8374-64d8c6676dbd" alt="runserver" width="700"/>
+  <img src="https://github.com/user-attachments/assets/e595f001-52a8-4ecf-8437-4a2187223f67" alt="runserver" width="700"/>
 </p>
 
 ---
