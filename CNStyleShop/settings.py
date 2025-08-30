@@ -110,7 +110,7 @@ DATABASES = {
         },
     },
 }
-DATABASES['default'] = DATABASES['sqlite3']
+DATABASES['default'] = DATABASES['mysql']
 
 AUTH_USER_MODEL = 'accounts.UserProfile'
 
